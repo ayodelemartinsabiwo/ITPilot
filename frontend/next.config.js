@@ -2,10 +2,13 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'export', // Enable static export for GitHub Pages
   images: {
     domains: ['localhost', 'api.itpilot.com'],
     formats: ['image/avif', 'image/webp'],
+    unoptimized: true, // Required for static export
   },
+  basePath: process.env.NODE_ENV === 'production' ? '/ITPilot' : '',
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws',
