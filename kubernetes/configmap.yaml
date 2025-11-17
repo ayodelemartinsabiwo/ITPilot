@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: itpilot-config
+  namespace: itpilot
+data:
+  DEBUG: "False"
+  ALLOWED_HOSTS: "api.itpilot.com,www.itpilot.com"
+  CORS_ALLOWED_ORIGINS: "https://itpilot.com,https://www.itpilot.com"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "itpilot_db"
+  REDIS_URL: "redis://redis-service:6379/0"
+  CELERY_BROKER_URL: "redis://redis-service:6379/1"
