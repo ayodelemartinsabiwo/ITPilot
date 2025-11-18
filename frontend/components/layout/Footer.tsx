@@ -142,13 +142,9 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-gray-800 pt-8 mt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex justify-center items-center">
             <p className="text-sm text-gray-400">
               &copy; {new Date().getFullYear()} ITPilot. All rights reserved.
-            </p>
-            <p className="text-sm text-gray-400">
-              Built with{' '}
-              <span className="text-orange-500">♥</span> by the ITPilot Team
             </p>
           </div>
         </div>

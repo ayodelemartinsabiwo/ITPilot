@@ -91,9 +91,6 @@ export default function RegisterPage() {
       >
         <Card className="shadow-xl">
           <CardHeader className="space-y-1 text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-orange">
-              <span className="text-white font-bold text-2xl">IT</span>
-            </div>
             <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
             <CardDescription>
               Get started with ITPilot and transform your IT support

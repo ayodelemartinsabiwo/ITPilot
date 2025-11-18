@@ -26,12 +26,13 @@ export function Navbar() {
   }, [])
 
   const isDashboard = pathname?.startsWith('/dashboard')
+  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/register')
 
   return (
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
+        isScrolled || isAuthPage
           ? 'bg-white/95 backdrop-blur-md shadow-md'
           : 'bg-transparent',
         isDashboard && 'bg-white border-b border-gray-200'
@@ -58,7 +59,7 @@ export function Navbar() {
               <span
                 className={cn(
                   'text-xl font-bold transition-colors',
-                  isScrolled || isDashboard ? 'text-black' : 'text-white'
+                  isScrolled || isDashboard || isAuthPage ? 'text-black' : 'text-white'
                 )}
               >
                 ITPilot
@@ -70,28 +71,28 @@ export function Navbar() {
           {!isDashboard && (
             <div className="hidden md:flex items-center gap-8">
               <Link
-                href="#features"
+                href="/#features"
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-orange-500',
-                  isScrolled ? 'text-gray-700' : 'text-white'
+                  isScrolled || isAuthPage ? 'text-gray-700' : 'text-white'
                 )}
               >
                 Features
               </Link>
               <Link
-                href="#pricing"
+                href="/#pricing"
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-orange-500',
-                  isScrolled ? 'text-gray-700' : 'text-white'
+                  isScrolled || isAuthPage ? 'text-gray-700' : 'text-white'
                 )}
               >
                 Pricing
               </Link>
               <Link
-                href="#about"
+                href="/about"
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-orange-500',
-                  isScrolled ? 'text-gray-700' : 'text-white'
+                  isScrolled || isAuthPage ? 'text-gray-700' : 'text-white'
                 )}
               >
                 About
