@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import { AnimatedBackground } from '@/components/AnimatedBackground'
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -81,6 +82,7 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black pt-32 pb-20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(249,115,22,0.1),transparent_50%)]" />
+        <AnimatedBackground opacity={0.3} showParticles={true} />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
