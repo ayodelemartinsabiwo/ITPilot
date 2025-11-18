@@ -205,10 +205,10 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {activityLoading ? (
+            {statsLoading ? (
               <div className="text-center py-8 text-gray-500">Loading...</div>
-            ) : activity && activity.length > 0 ? (
-              activity.slice(0, 5).map((item: any, index: number) => (
+            ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
+              stats.recent_activity.slice(0, 5).map((item: any, index: number) => (
                 <div
                   key={index}
                   className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
@@ -221,12 +221,12 @@ export default function DashboardPage() {
                       {item.title}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {item.description}
+                      Ticket #{item.ticket_number}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500">
-                      {formatRelativeTime(item.timestamp)}
+                      {formatRelativeTime(item.created_at)}
                     </p>
                     {item.status && (
                       <StatusBadge status={item.status} size="sm" className="mt-1" />
