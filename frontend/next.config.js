@@ -2,13 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'export', // Enable static export for GitHub Pages
   images: {
-    unoptimized: true, // Required for static export
+    domains: ['localhost'],
   },
-  // Set basePath for GitHub Pages
-  basePath: process.env.NODE_ENV === 'production' ? '/ITPilot' : '',
-  // Remove rewrites - they don't work with static export
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
