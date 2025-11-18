@@ -33,14 +33,14 @@ const contactMethods = [
   {
     icon: Phone,
     title: 'Call Us',
-    description: '24/7 phone support available',
-    value: '+1 (555) 123-4567',
+    description: 'Available during business hours',
+    value: '+234 902 507 3903 | +234 813 274 0250',
   },
   {
     icon: MapPin,
     title: 'Visit Us',
     description: 'Come say hello at our office',
-    value: '123 Tech Street, San Francisco, CA 94102',
+    value: '5, Otigba Street, Computer Village, Ikeja, Lagos, Nigeria',
   },
 ]
 

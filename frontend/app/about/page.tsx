@@ -32,12 +32,12 @@ const values = [
 ]
 
 const milestones = [
-  { year: '2025 Q1', title: 'Launch & Vision', description: 'ITPilot launches with AI-powered IT support vision' },
-  { year: '2025 Q2', title: 'Early Adoption', description: 'First 100 teams join our platform' },
-  { year: '2025 Q3', title: 'AI Enhancement', description: 'Advanced NLP and predictive analytics deployment' },
-  { year: '2025 Q4', title: 'Market Expansion', description: 'Reaching 500+ teams across multiple countries' },
-  { year: '2026', title: 'Enterprise Features', description: 'SOC 2 certification and global infrastructure' },
-  { year: '2027', title: 'Global Impact', description: 'Achieving 5,000+ teams milestone worldwide' },
+  { year: 'Nov 2025', title: 'Platform Launch', description: 'ITPilot goes live with core AI-powered IT support features' },
+  { year: 'Dec 2025', title: 'Beta Testing', description: 'Onboard first 20 beta teams and gather feedback' },
+  { year: 'Q1 2026', title: 'Public Release', description: 'Official launch with refined features and first 100 customers' },
+  { year: 'Q2 2026', title: 'AI Enhancement', description: 'Advanced NLP, predictive analytics, and automation workflows' },
+  { year: 'Q3-Q4 2026', title: 'Enterprise Ready', description: 'SOC 2 certification, global infrastructure, reaching 500+ teams' },
+  { year: '2027', title: 'Global Impact', description: 'Achieving 5,000+ teams milestone across 25+ countries' },
 ]
 
 export default function AboutPage() {

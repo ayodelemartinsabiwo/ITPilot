@@ -1,18 +1,17 @@
 import Link from 'next/link'
 import { Github, Twitter, Linkedin, Mail } from 'lucide-react'
+import { AnimatedBackground } from '@/components/AnimatedBackground'
 
 const footerLinks = {
   product: [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Features', href: '/features' },
+    { name: 'Pricing', href: '/pricing' },
     { name: 'Documentation', href: '/docs' },
     { name: 'API Reference', href: '/api-docs' },
   ],
   company: [
     { name: 'About Us', href: '/about' },
-    { name: 'Blog', href: '/blog' },
     { name: 'Careers', href: '/careers' },
-    { name: 'Contact', href: '/contact' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/privacy' },
@@ -22,9 +21,7 @@ const footerLinks = {
   ],
   support: [
     { name: 'Help Center', href: '/help' },
-    { name: 'Community', href: '/community' },
-    { name: 'Status', href: '/status' },
-    { name: 'Report Issue', href: '/report' },
+    { name: 'Contact', href: '/contact' },
   ],
 }
 
@@ -37,8 +34,9 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <footer className="relative bg-gray-900 text-gray-300 overflow-hidden">
+      <AnimatedBackground opacity={0.3} showParticles={true} />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2">

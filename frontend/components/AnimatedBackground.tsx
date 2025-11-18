@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 
-export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
+export function AnimatedBackground({ opacity = 0.5, showParticles = true }: { opacity?: number; showParticles?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -20,10 +20,10 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
     setCanvasSize()
     window.addEventListener('resize', setCanvasSize)
 
-    // Laptop positions with perspective - center laptop moved down by 252px (3.5 inches)
+    // Laptop positions with perspective - center laptop moved down by 7.5 inches total
     const laptops = [
       { x: 0.2, y: 0.25, size: 1.1, rotation: -15, delay: 0 },
-      { x: 0.5, y: 0.6, size: 1.4, rotation: 0, delay: 0.5 }, // Moved down and made bigger
+      { x: 0.5, y: 0.7, size: 1.4, rotation: 0, delay: 0.5 }, // Moved down more (0.6 -> 0.7)
       { x: 0.8, y: 0.35, size: 1, rotation: 15, delay: 1 },
     ]
 
@@ -58,12 +58,12 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
 
       ctx.translate(0, float)
 
-      // Add glow effect to wireframes
-      ctx.shadowBlur = 15
-      ctx.shadowColor = 'rgba(59, 130, 246, 0.6)'
+      // Add glow effect to wireframes - more visible
+      ctx.shadowBlur = 25
+      ctx.shadowColor = 'rgba(59, 130, 246, 0.9)'
 
       // Laptop base (keyboard)
-      ctx.strokeStyle = `rgba(59, 130, 246, ${0.7 * opacity})` // Light blue with glow
+      ctx.strokeStyle = `rgba(59, 130, 246, ${0.8 * opacity})` // More visible blue with glow
       ctx.lineWidth = 2
       ctx.setLineDash([3, 3]) // Smaller dashes
 
@@ -88,14 +88,14 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
       ctx.closePath()
       ctx.stroke()
 
-      // Screen inner glow
-      ctx.shadowBlur = 20
-      ctx.fillStyle = `rgba(59, 130, 246, ${0.15 * opacity})`
+      // Screen inner glow - more visible
+      ctx.shadowBlur = 30
+      ctx.fillStyle = `rgba(59, 130, 246, ${0.2 * opacity})`
       ctx.fill()
 
       // Screen lines (code-like)
-      ctx.shadowBlur = 8
-      ctx.strokeStyle = `rgba(249, 115, 22, ${0.4 * opacity})` // Orange
+      ctx.shadowBlur = 12
+      ctx.strokeStyle = `rgba(249, 115, 22, ${0.5 * opacity})` // Orange
       ctx.lineWidth = 1
       ctx.setLineDash([2, 3]) // Smaller dashes
 
@@ -137,9 +137,9 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
         ctx.lineTo(x2, y2)
         ctx.stroke()
 
-        // Glow effect
-        ctx.shadowBlur = 10
-        ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
+        // Glow effect - more visible
+        ctx.shadowBlur = 15
+        ctx.shadowColor = 'rgba(59, 130, 246, 0.7)'
         ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * opacity})`
         ctx.lineWidth = 4
         ctx.setLineDash([5, 8]) // Smaller dashes
@@ -174,6 +174,8 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
     }
 
     const drawConstellationParticles = () => {
+      if (!showParticles) return
+
       ctx.shadowBlur = 0
 
       // Update and draw particles
@@ -245,7 +247,7 @@ export function AnimatedBackground({ opacity = 0.6 }: { opacity?: number }) {
       window.removeEventListener('resize', setCanvasSize)
       cancelAnimationFrame(animationFrame)
     }
-  }, [opacity])
+  }, [opacity, showParticles])
 
   return (
     <canvas
