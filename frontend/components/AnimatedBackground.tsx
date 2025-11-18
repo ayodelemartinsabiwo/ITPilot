@@ -31,7 +31,7 @@ export function AnimatedBackground({ opacity = 0.7 }: { opacity?: number }) {
     let animationFrame: number
     let time = 0
 
-    const draw Laptop = (laptop: typeof laptops[0], t: number) => {
+    const drawLaptop = (laptop: typeof laptops[0], t: number) => {
       const centerX = canvas.width * laptop.x
       const centerY = canvas.height * laptop.y
       const baseSize = Math.min(canvas.width, canvas.height) * 0.15 * laptop.size
