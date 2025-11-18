@@ -32,12 +32,12 @@ const values = [
 ]
 
 const milestones = [
-  { year: '2023', title: 'Founded', description: 'ITPilot was born from a simple frustration' },
-  { year: '2023 Q3', title: 'Beta Launch', description: '50 early adopters helped shape our vision' },
-  { year: '2024 Q1', title: 'AI Integration', description: 'Launched intelligent chatbot with NLP' },
-  { year: '2024 Q2', title: '1,000+ Customers', description: 'Growing trust across 25 countries' },
-  { year: '2024 Q3', title: 'Enterprise Ready', description: 'SOC 2 certified and GDPR compliant' },
-  { year: '2025', title: 'Global Expansion', description: 'Serving 5,000+ teams worldwide' },
+  { year: '2025 Q1', title: 'Launch & Vision', description: 'ITPilot launches with AI-powered IT support vision' },
+  { year: '2025 Q2', title: 'Early Adoption', description: 'First 100 teams join our platform' },
+  { year: '2025 Q3', title: 'AI Enhancement', description: 'Advanced NLP and predictive analytics deployment' },
+  { year: '2025 Q4', title: 'Market Expansion', description: 'Reaching 500+ teams across multiple countries' },
+  { year: '2026', title: 'Enterprise Features', description: 'SOC 2 certification and global infrastructure' },
+  { year: '2027', title: 'Global Impact', description: 'Achieving 5,000+ teams milestone worldwide' },
 ]
 
 export default function AboutPage() {
@@ -85,46 +85,49 @@ export default function AboutPage() {
 
               <div className="space-y-6 text-gray-700 leading-relaxed">
                 <p className="text-xl text-gray-800">
-                  It was 3 AM when Sarah received yet another urgent call. As the sole IT technician
-                  for a growing company, she was drowning in support tickets, struggling to keep track
+                  It was 3 AM when Dele received yet another urgent call. As the sole IT technician
+                  for a growing company, he was drowning in support tickets, struggling to keep track
                   of 200+ devices, and spending more time on password resets than actual problem-solving.
                 </p>
 
                 <p>
-                  Sarah's story isn't unique. Across organizations worldwide, IT teams are overwhelmed.
+                  Dele's story isn't unique. Across organizations worldwide, IT teams are overwhelmed.
                   They're expected to be available 24/7, manage an ever-growing fleet of devices,
                   respond to hundreds of tickets, and somehow still find time for strategic projects.
                 </p>
 
                 <p>
-                  <strong>We founded ITPilot because we've been there.</strong> Our founding team consists
-                  of former IT managers, system administrators, and help desk technicians who spent years
-                  in the trenches. We know the frustration of outdated ticketing systems, the anxiety of
-                  devices failing without warning, and the exhaustion of answering the same questions
-                  repeatedly.
+                  <strong>We founded ITPilot in 2025 because we've been there.</strong> Our founding team consists
+                  of former IT managers, system administrators, help desk technicians, experienced marketers with
+                  vast understanding of consumer needs, and AI agents experts who saw the transformative potential
+                  of artificial intelligence. We know the frustration of outdated ticketing systems, the anxiety of
+                  devices failing without warning, and the exhaustion of answering the same questions repeatedly.
                 </p>
 
                 <p>
-                  In 2023, we asked ourselves: <em>"What if AI could handle the repetitive tasks? What if
-                  devices could tell us when they're about to fail? What if IT teams could focus on
-                  innovation instead of firefighting?"</em>
+                  In 2025, as AI technology reached new heights, we asked ourselves: <em>"What if AI could handle
+                  the repetitive tasks? What if devices could tell us when they're about to fail? What if IT teams
+                  could focus on innovation instead of firefighting?"</em> The AI revolution made this vision not
+                  just possible, but necessary.
                 </p>
 
                 <p>
                   That vision became ITPilot—an AI-powered platform that doesn't just automate IT support,
-                  it transforms it. We built the tool we wish we'd had during those long, frustrating nights.
+                  it transforms it. We built the tool we wish we'd had during those long, frustrating nights,
+                  leveraging the latest advances in natural language processing, machine learning, and predictive
+                  analytics.
                 </p>
 
                 <p className="text-xl text-gray-800 font-semibold">
-                  Today, ITPilot serves over 5,000 IT teams across 25 countries. Sarah? She now sleeps
-                  through the night. Her AI assistant handles routine requests, her dashboards show device
-                  health at a glance, and she finally has time to work on the infrastructure improvements
-                  she's been planning for years.
+                  From our launch in 2025, ITPilot aspires to serve over 5,000 IT teams across 25+ countries
+                  by 2027. Dele? He will soon sleep through the night. His AI assistant will handle routine
+                  requests, his dashboards will show device health at a glance, and he'll finally have time
+                  to work on the infrastructure improvements he's been planning for years.
                 </p>
 
                 <p>
                   We're not just building software—we're giving IT professionals their time, sanity, and
-                  passion for technology back.
+                  passion for technology back. Join us in this AI-powered revolution.
                 </p>
               </div>
             </motion.div>
@@ -187,10 +190,10 @@ export default function AboutPage() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-black mb-4">
-              Our Journey
+              Our Roadmap to 2027
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From a frustrated IT team to a global platform
+              Building the future of AI-powered IT support, one milestone at a time
             </p>
           </motion.div>
 
@@ -240,6 +243,9 @@ export default function AboutPage() {
             <h2 className="text-4xl font-bold text-black mb-4">
               ITPilot by the Numbers
             </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              What we envision before 2027 — Be part of it
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">

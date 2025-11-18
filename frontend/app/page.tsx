@@ -58,7 +58,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black pt-20 pb-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(249,115,22,0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(249,115,22,0.1),transparent_50%)]" />
-        <AnimatedBackground opacity={0.7} />
+        <AnimatedBackground opacity={0.6} />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
@@ -216,7 +216,7 @@ export default function LandingPage() {
               <Card className="p-8 text-center hover:shadow-orange transition-all duration-300">
                 <h3 className="text-2xl font-bold text-black mb-2">Starter</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">$29</span>
+                  <span className="text-4xl font-bold text-black">₦35k</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <p className="text-gray-600 mb-6">Perfect for small teams</p>
@@ -240,7 +240,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-black mb-2">Professional</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">$99</span>
+                  <span className="text-4xl font-bold text-black">₦120k</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <p className="text-gray-600 mb-6">For growing teams</p>
@@ -261,7 +261,7 @@ export default function LandingPage() {
               <Card className="p-8 text-center hover:shadow-orange transition-all duration-300">
                 <h3 className="text-2xl font-bold text-black mb-2">Enterprise</h3>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-black">$299</span>
+                  <span className="text-4xl font-bold text-black">₦360k</span>
                   <span className="text-gray-600">/month</span>
                 </div>
                 <p className="text-gray-600 mb-6">For large organizations</p>

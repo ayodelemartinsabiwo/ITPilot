@@ -14,7 +14,7 @@ const plans = [
   {
     name: 'Starter',
     icon: Zap,
-    price: { monthly: 29, annual: 290 },
+    price: { monthly: 35000, annual: 350000 },
     description: 'Perfect for small teams getting started with IT automation',
     features: [
       'Up to 50 devices',
@@ -38,7 +38,7 @@ const plans = [
   {
     name: 'Professional',
     icon: Building,
-    price: { monthly: 99, annual: 990 },
+    price: { monthly: 120000, annual: 1200000 },
     description: 'For growing teams that need advanced features and integrations',
     features: [
       'Up to 500 devices',
@@ -65,7 +65,7 @@ const plans = [
   {
     name: 'Enterprise',
     icon: Crown,
-    price: { monthly: 299, annual: 2990 },
+    price: { monthly: 360000, annual: 3600000 },
     description: 'For large organizations requiring enterprise-grade features',
     features: [
       'Unlimited devices',
@@ -249,13 +249,13 @@ export default function PricingPage() {
                         <>
                           <div className="flex items-baseline gap-1">
                             <span className="text-4xl font-bold text-black">
-                              ${billingPeriod === 'monthly' ? plan.price.monthly : Math.floor(plan.price.annual / 12)}
+                              ₦{(billingPeriod === 'monthly' ? plan.price.monthly : Math.floor(plan.price.annual / 12)).toLocaleString()}
                             </span>
                             <span className="text-gray-600">/month</span>
                           </div>
                           {billingPeriod === 'annual' && (
                             <p className="text-sm text-gray-600 mt-1">
-                              ${plan.price.annual} billed annually
+                              ₦{plan.price.annual.toLocaleString()} billed annually
                             </p>
                           )}
                         </>
