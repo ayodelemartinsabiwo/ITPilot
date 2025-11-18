@@ -71,7 +71,7 @@ export function Navbar() {
           {!isDashboard && (
             <div className="hidden md:flex items-center gap-8">
               <Link
-                href="/#features"
+                href="/features"
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-orange-500',
                   isScrolled || isAuthPage ? 'text-gray-700' : 'text-white'
@@ -80,7 +80,7 @@ export function Navbar() {
                 Features
               </Link>
               <Link
-                href="/#pricing"
+                href="/pricing"
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-orange-500',
                   isScrolled || isAuthPage ? 'text-gray-700' : 'text-white'
