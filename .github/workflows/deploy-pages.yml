@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["claude/itpilot-srs-document-016uV7juCJjQKTz42WjCJKuR", "master"]
   workflow_dispatch:
 
 permissions:
