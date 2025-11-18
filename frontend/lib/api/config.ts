@@ -53,7 +53,7 @@ export const API_ENDPOINTS = {
     invoices: '/billing/invoices/',
   },
   dashboard: {
-    stats: '/dashboard/stats/',
+    stats: '/auth/dashboard/',
     recentActivity: '/dashboard/recent-activity/',
     alerts: '/dashboard/alerts/',
   },

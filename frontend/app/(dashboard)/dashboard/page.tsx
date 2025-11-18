@@ -15,7 +15,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
-import { dashboardAPI } from '@/lib/api'
+import { dashboardService } from '@/lib/api/services/dashboard.service'
 import { formatRelativeTime } from '@/lib/utils'
 import {
   LineChart,
@@ -32,70 +32,52 @@ import {
 } from 'recharts'
 
 export default function DashboardPage() {
-  const { data: stats, isLoading: statsLoading } = useQuery({
+  const { data: dashboardData, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
-      const response = await dashboardAPI.getStats()
+      const response = await dashboardService.getDashboardStats()
       return response.data
     },
   })
 
-  const { data: activity, isLoading: activityLoading } = useQuery({
-    queryKey: ['dashboard-activity'],
-    queryFn: async () => {
-      const response = await dashboardAPI.getRecentActivity()
-      return response.data
-    },
-  })
-
-  const { data: chartData, isLoading: chartLoading } = useQuery({
-    queryKey: ['dashboard-charts'],
-    queryFn: async () => {
-      const response = await dashboardAPI.getChartData('tickets', '7d')
-      return response.data
-    },
-  })
+  const stats = dashboardData?.data
 
   const statCards = [
     {
       title: 'Total Devices',
-      value: stats?.totalDevices || 0,
-      change: '+12%',
-      trend: 'up',
+      value: stats?.devices?.total || 0,
+      subtitle: `${stats?.devices?.online || 0} online · ${stats?.devices?.offline || 0} offline`,
       icon: Laptop,
       color: 'orange',
       bgColor: 'bg-orange-50',
       iconColor: 'text-orange-500',
     },
     {
-      title: 'Open Tickets',
-      value: stats?.openTickets || 0,
-      change: '-8%',
-      trend: 'down',
+      title: 'Total Tickets',
+      value: stats?.tickets?.total || 0,
+      subtitle: `${stats?.tickets?.open || 0} open · ${stats?.tickets?.in_progress || 0} in progress`,
       icon: Ticket,
       color: 'blue',
       bgColor: 'bg-blue-50',
       iconColor: 'text-blue-500',
     },
     {
-      title: 'Avg. Response Time',
-      value: `${stats?.avgResponseTime || 0}m`,
-      change: '-15%',
-      trend: 'down',
-      icon: Clock,
+      title: 'Resolved Tickets',
+      value: stats?.tickets?.resolved || 0,
+      subtitle: `${stats?.tickets?.recent || 0} this week`,
+      icon: CheckCircle2,
       color: 'green',
       bgColor: 'bg-green-50',
       iconColor: 'text-green-500',
     },
     {
-      title: 'Satisfaction Rate',
-      value: `${stats?.satisfactionRate || 0}%`,
-      change: '+5%',
-      trend: 'up',
-      icon: CheckCircle2,
-      color: 'purple',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-500',
+      title: 'Critical Issues',
+      value: stats?.tickets?.by_priority?.critical || 0,
+      subtitle: `${stats?.tickets?.by_priority?.high || 0} high priority`,
+      icon: Activity,
+      color: 'red',
+      bgColor: 'bg-red-50',
+      iconColor: 'text-red-500',
     },
   ]
 
@@ -123,7 +105,6 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon
-          const TrendIcon = stat.trend === 'up' ? TrendingUp : TrendingDown
 
           return (
             <motion.div
@@ -134,23 +115,19 @@ export default function DashboardPage() {
             >
               <Card className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center mb-4">
                     <div className={`w-12 h-12 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
                       <Icon className={`w-6 h-6 ${stat.iconColor}`} />
                     </div>
-                    <Badge
-                      variant={stat.trend === 'up' ? 'success' : 'info'}
-                      className="gap-1"
-                    >
-                      <TrendIcon className="w-3 h-3" />
-                      {stat.change}
-                    </Badge>
                   </div>
                   <h3 className="text-sm font-medium text-gray-600 mb-1">
                     {stat.title}
                   </h3>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stat.value}
+                  <p className="text-3xl font-bold text-gray-900 mb-2">
+                    {statsLoading ? '...' : stat.value}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {stat.subtitle}
                   </p>
                 </CardContent>
               </Card>

@@ -295,3 +295,92 @@ class APIKeyListCreateView(generics.ListCreateAPIView):
 
         # Return the full key only once
         self.api_key_created = api_key
+
+
+class DashboardStatsView(views.APIView):
+    """Get dashboard statistics for the authenticated user."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from devices.models import Device
+        from tickets.models import Ticket
+        from organizations.models import OrganizationMember
+        from django.db.models import Q, Count
+        from datetime import timedelta
+
+        user = request.user
+
+        # Get user's organizations
+        user_orgs = OrganizationMember.objects.filter(
+            user=user,
+            is_active=True
+        ).values_list('organization_id', flat=True)
+
+        # Get devices count
+        devices_query = Device.objects.filter(
+            Q(organization_id__in=user_orgs) | Q(user=user)
+        ).distinct()
+
+        total_devices = devices_query.count()
+        online_devices = devices_query.filter(status='ONLINE').count()
+        offline_devices = devices_query.filter(status='OFFLINE').count()
+
+        # Get tickets statistics
+        tickets_query = Ticket.objects.filter(
+            Q(created_by=user) |
+            Q(assigned_to=user) |
+            Q(organization_id__in=user_orgs)
+        ).distinct()
+
+        total_tickets = tickets_query.count()
+        open_tickets = tickets_query.filter(status='OPEN').count()
+        in_progress_tickets = tickets_query.filter(status='IN_PROGRESS').count()
+        resolved_tickets = tickets_query.filter(status='RESOLVED').count()
+
+        # Get recent tickets (last 7 days)
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        recent_tickets = tickets_query.filter(
+            created_at__gte=seven_days_ago
+        ).count()
+
+        # Get tickets by priority
+        tickets_by_priority = tickets_query.values('priority').annotate(
+            count=Count('id')
+        )
+        priority_stats = {item['priority']: item['count'] for item in tickets_by_priority}
+
+        # Get recent activity (last 5 tickets)
+        recent_activity = tickets_query.order_by('-created_at')[:5].values(
+            'id', 'ticket_number', 'title', 'status', 'priority', 'created_at'
+        )
+
+        return Response({
+            'success': True,
+            'data': {
+                'devices': {
+                    'total': total_devices,
+                    'online': online_devices,
+                    'offline': offline_devices,
+                },
+                'tickets': {
+                    'total': total_tickets,
+                    'open': open_tickets,
+                    'in_progress': in_progress_tickets,
+                    'resolved': resolved_tickets,
+                    'recent': recent_tickets,
+                    'by_priority': {
+                        'low': priority_stats.get('LOW', 0),
+                        'medium': priority_stats.get('MEDIUM', 0),
+                        'high': priority_stats.get('HIGH', 0),
+                        'critical': priority_stats.get('CRITICAL', 0),
+                    }
+                },
+                'recent_activity': list(recent_activity),
+                'user': {
+                    'full_name': user.full_name,
+                    'email': user.email,
+                    'role': user.role,
+                }
+            }
+        })
+
