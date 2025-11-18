@@ -128,7 +128,7 @@ class TicketDetailSerializer(TicketSerializer):
 class CreateTicketSerializer(serializers.Serializer):
     """Serializer for creating a new ticket."""
     title = serializers.CharField(max_length=255)
-    description = serializers.TextField()
+    description = serializers.CharField(style={'base_template': 'textarea.html'})
     category = serializers.ChoiceField(choices=Ticket.CATEGORY_CHOICES)
     priority = serializers.ChoiceField(choices=Ticket.PRIORITY_CHOICES, default='MEDIUM')
     device = serializers.UUIDField(required=False, allow_null=True)

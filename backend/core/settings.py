@@ -77,9 +77,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'common.middleware.TenantMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Required by django-allauth
+    # 'common.middleware.TenantMiddleware',  # Disabled for simple development
     'common.middleware.AuditLogMiddleware',
-    'common.middleware.RateLimitMiddleware',
+    # 'common.middleware.RateLimitMiddleware',  # Disabled - requires Redis
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -104,42 +105,64 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME', default='itpilot_db'),
-        'USER': env('DB_USER', default='itpilot_user'),
-        'PASSWORD': env('DB_PASSWORD', default='itpilot_password'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
-        'OPTIONS': {
-            'connect_timeout': 10,
-        },
+# Check if DATABASE_URL is set for SQLite or PostgreSQL
+database_url = env('DATABASE_URL', default='')
+if database_url.startswith('sqlite'):
+    # SQLite configuration for development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    # PostgreSQL configuration for production
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME', default='itpilot_db'),
+            'USER': env('DB_USER', default='itpilot_user'),
+            'PASSWORD': env('DB_PASSWORD', default='itpilot_password'),
+            'HOST': env('DB_HOST', default='localhost'),
+            'PORT': env('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': {
+                'connect_timeout': 10,
+            },
+        }
+    }
 
 # Cache configuration
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': env('REDIS_URL', default='redis://localhost:6379/0'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 50,
-                'retry_on_timeout': True,
-            },
-            'SOCKET_CONNECT_TIMEOUT': 5,
-            'SOCKET_TIMEOUT': 5,
-        },
-        'KEY_PREFIX': 'itpilot',
-        'TIMEOUT': 300,
+# Use in-memory cache for development if Redis is not available
+if DEBUG and not env('REDIS_URL', default='').startswith('redis://'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
     }
-}
+    SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': env('REDIS_URL', default='redis://localhost:6379/0'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 50,
+                    'retry_on_timeout': True,
+                },
+                'SOCKET_CONNECT_TIMEOUT': 5,
+                'SOCKET_TIMEOUT': 5,
+            },
+            'KEY_PREFIX': 'itpilot',
+            'TIMEOUT': 300,
+        }
+    }
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 # Session configuration
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 SESSION_COOKIE_AGE = env.int('SESSION_COOKIE_AGE', default=86400)
 SESSION_COOKIE_SECURE = not DEBUG
@@ -274,16 +297,24 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 
 # Channels (WebSocket)
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [env('REDIS_URL', default='redis://localhost:6379/0')],
-            'capacity': 1500,
-            'expiry': 10,
+# Use in-memory channel layer for development if Redis is not available
+if DEBUG and not env('REDIS_URL', default='').startswith('redis://'):
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
         },
-    },
-}
+    }
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [env('REDIS_URL', default='redis://localhost:6379/0')],
+                'capacity': 1500,
+                'expiry': 10,
+            },
+        },
+    }
 
 # Celery Configuration
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/1')
