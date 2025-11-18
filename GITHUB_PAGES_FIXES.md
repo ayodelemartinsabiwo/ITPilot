@@ -94,16 +94,76 @@ Simplified `frontend/next.config.js`:
 
 ---
 
+## Issue #4: Module Not Found - Import Statement ❌ → ✅
+
+### Error
+```
+Module not found: Can't resolve 'tailwindcss-merge'
+
+Import trace for requested module:
+./app/(dashboard)/dashboard/page.tsx
+```
+
+### Root Cause
+We fixed the package name in `package.json` but forgot to update the import statement in `frontend/lib/utils.ts`. The code was still trying to import from the old package name.
+
+### Fix Applied
+Updated import in `frontend/lib/utils.ts`:
+```typescript
+// Before
+import { twMerge } from 'tailwindcss-merge'
+
+// After
+import { twMerge } from 'tailwind-merge'
+```
+
+**Files Modified**: `frontend/lib/utils.ts`
+**Commit**: 356e1a0
+
+---
+
+## Issue #5: .gitignore Blocking Frontend Files ❌ → ✅
+
+### Error
+```
+The following paths are ignored by one of your .gitignore files:
+frontend/lib
+```
+
+### Root Cause
+The `.gitignore` file had `lib/` which was intended for Python library directories, but it was also ignoring the Next.js `frontend/lib/` directory containing our utility files.
+
+### Fix Applied
+Made `.gitignore` more specific to only ignore backend Python lib directories:
+```gitignore
+# Before
+lib/
+lib64/
+
+# After
+backend/lib/
+backend/lib64/
+```
+
+**Files Modified**: `.gitignore`, added all `frontend/lib/*.ts` files
+**Commit**: 356e1a0
+
+---
+
 ## Complete Fix Timeline
 
 1. **First Attempt** - Created deploy-pages.yml workflow
 2. **Issue #1 Found** - Package manager detection failed
 3. **Fix #1** - Updated paths to `frontend/` subdirectory
-4. **Issue #2 Found** - Invalid package name
+4. **Issue #2 Found** - Invalid package name in package.json
 5. **Fix #2** - Corrected to `tailwind-merge`
 6. **Issue #3 Found** - Rewrite configuration error
 7. **Fix #3** - Removed rewrites, simplified config
-8. **Final State** - All issues resolved ✅
+8. **Issue #4 Found** - Import statement still using old package name
+9. **Fix #4** - Updated import in utils.ts
+10. **Issue #5 Found** - .gitignore blocking frontend/lib files
+11. **Fix #5** - Made .gitignore specific to backend/lib only
+12. **Final State** - All issues resolved ✅
 
 ---
 
