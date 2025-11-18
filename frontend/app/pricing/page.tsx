@@ -285,7 +285,7 @@ export default function PricingPage() {
                   <Link href={plan.cta === 'Contact Sales' ? '/contact' : '/register'}>
                     <Button
                       className="w-full"
-                      variant={plan.popular ? 'default' : 'outline'}
+                      variant={plan.popular ? 'primary' : 'outline'}
                       size="lg"
                     >
                       {plan.cta}
