@@ -32,15 +32,13 @@ import {
 } from 'recharts'
 
 export default function DashboardPage() {
-  const { data: dashboardData, isLoading: statsLoading } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const response = await dashboardService.getDashboardStats()
       return response.data
     },
   })
-
-  const stats = dashboardData?.data
 
   const statCards = [
     {
