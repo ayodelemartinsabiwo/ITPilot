@@ -26,7 +26,7 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-this-in-productio
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.railway.app', '.up.railway.app'])
 
 # Application definition
 INSTALLED_APPS = [
@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
-# Check if DATABASE_URL is set for SQLite or PostgreSQL
+# Database configuration
 database_url = env('DATABASE_URL', default='')
 if database_url.startswith('sqlite'):
     # SQLite configuration for development
@@ -115,8 +115,18 @@ if database_url.startswith('sqlite'):
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+elif database_url.startswith('postgres'):
+    # PostgreSQL configuration for production (Railway, Heroku, etc.)
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 else:
-    # PostgreSQL configuration for production
+    # Fallback PostgreSQL configuration
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -270,8 +280,16 @@ SIMPLE_JWT = {
 # CORS Settings
 CORS_ALLOWED_ORIGINS = env.list(
     'CORS_ALLOWED_ORIGINS',
-    default=['http://localhost:3000', 'http://localhost:8000']
+    default=[
+        'http://localhost:3000',
+        'http://localhost:8000',
+        'https://it-pilot.vercel.app',
+    ]
 )
+# Allow all Vercel preview deployments
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'accept',
