@@ -12,8 +12,8 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { authAPI } from '@/lib/api'
-import { useAuthStore } from '@/lib/store'
+import { authService } from '@/lib/api/services/auth.service'
+import { useAuthStore } from '@/lib/store/auth'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -41,15 +41,17 @@ export default function LoginPage() {
       setIsLoading(true)
       setError('')
 
-      const response = await authAPI.login(data)
-      const { user, access, refresh } = response.data
+      await login(data)
 
-      login(user, { access, refresh })
       toast.success('Welcome back!')
       router.push('/dashboard')
     } catch (err: any) {
       console.error('Login error:', err)
-      const errorMessage = err.response?.data?.detail || 'Invalid email or password'
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        'Invalid email or password'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {

@@ -12,30 +12,32 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { authAPI } from '@/lib/api'
-import { useAuthStore } from '@/lib/store'
+import { authService } from '@/lib/api/services/auth.service'
+import { useAuthStore } from '@/lib/store/auth'
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  first_name: z.string().min(2, 'First name must be at least 2 characters'),
+  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
+  password_confirm: z.string(),
+}).refine((data) => data.password === data.password_confirm, {
   message: "Passwords don't match",
-  path: ['confirmPassword'],
+  path: ['password_confirm'],
 })
 
 type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { login } = useAuthStore()
+  const { register: registerUser } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const {
     register,
@@ -59,21 +61,25 @@ export default function RegisterPage() {
     try {
       setIsLoading(true)
       setError('')
+      setSuccess(false)
 
-      const response = await authAPI.register({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      })
+      await registerUser(data)
 
-      const { user, access, refresh } = response.data
+      setSuccess(true)
+      toast.success('Account created successfully! Please check your email to verify your account.')
 
-      login(user, { access, refresh })
-      toast.success('Account created successfully!')
-      router.push('/dashboard')
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        router.push('/login')
+      }, 2000)
     } catch (err: any) {
       console.error('Registration error:', err)
-      const errorMessage = err.response?.data?.detail || err.response?.data?.email?.[0] || 'Failed to create account'
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.password?.[0] ||
+        err.response?.data?.detail ||
+        'Failed to create account'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {
@@ -106,17 +112,38 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <Input
-                id="name"
-                type="text"
-                label="Full Name"
-                placeholder="John Doe"
-                leftIcon={<User className="w-5 h-5" />}
-                error={errors.name?.message}
-                {...register('name')}
-                disabled={isLoading}
-                required
-              />
+              {success && (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                  <p>Account created! Redirecting to login...</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  id="first_name"
+                  type="text"
+                  label="First Name"
+                  placeholder="John"
+                  leftIcon={<User className="w-5 h-5" />}
+                  error={errors.first_name?.message}
+                  {...register('first_name')}
+                  disabled={isLoading}
+                  required
+                />
+
+                <Input
+                  id="last_name"
+                  type="text"
+                  label="Last Name"
+                  placeholder="Doe"
+                  leftIcon={<User className="w-5 h-5" />}
+                  error={errors.last_name?.message}
+                  {...register('last_name')}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
 
               <Input
                 id="email"
@@ -166,13 +193,13 @@ export default function RegisterPage() {
               )}
 
               <Input
-                id="confirmPassword"
+                id="password_confirm"
                 type="password"
                 label="Confirm Password"
                 placeholder="Re-enter your password"
                 leftIcon={<Lock className="w-5 h-5" />}
-                error={errors.confirmPassword?.message}
-                {...register('confirmPassword')}
+                error={errors.password_confirm?.message}
+                {...register('password_confirm')}
                 disabled={isLoading}
                 required
               />
