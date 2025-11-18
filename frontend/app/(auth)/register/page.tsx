@@ -20,7 +20,7 @@ const registerSchema = z.object({
   last_name: z.string().min(2, 'Last name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string()
-    .min(8, 'Password must be at least 8 characters')
+    .min(12, 'Password must be at least 12 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
@@ -51,7 +51,7 @@ export default function RegisterPage() {
   const password = watch('password', '')
 
   const passwordRequirements = [
-    { text: 'At least 8 characters', met: password.length >= 8 },
+    { text: 'At least 12 characters', met: password.length >= 12 },
     { text: 'One uppercase letter', met: /[A-Z]/.test(password) },
     { text: 'One lowercase letter', met: /[a-z]/.test(password) },
     { text: 'One number', met: /[0-9]/.test(password) },
