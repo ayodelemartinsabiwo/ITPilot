@@ -1,7 +1,8 @@
 """
 Django management command to seed initial data for ITPilot.
 
-This command creates sample plans, organizations, and other essential data.
+This command creates subscription plans matching frontend pricing page.
+All prices in Naira (NGN) as shown on frontend.
 """
 
 from django.core.management.base import BaseCommand
@@ -10,83 +11,54 @@ from decimal import Decimal
 
 
 class Command(BaseCommand):
-    help = 'Seed initial data for ITPilot (Plans, etc.)'
+    help = 'Seed subscription plans matching frontend pricing (Naira)'
 
     def handle(self, *args, **options):
-        self.stdout.write('Seeding initial data...')
+        self.stdout.write('Seeding subscription plans (matching frontend in Naira)...')
 
-        # Create subscription plans
+        # Plans matching frontend/app/pricing/page.tsx - ALL IN NAIRA (NGN)
         plans_data = [
-            {
-                'name': 'Free',
-                'slug': 'free',
-                'description': 'Perfect for individuals and small teams getting started',
-                'price': Decimal('0.00'),
-                'currency': 'USD',
-                'billing_interval': 'MONTHLY',
-                'max_users': 1,
-                'max_devices': 2,
-                'max_tickets_per_month': 10,
-                'max_storage_gb': 1,
-                'has_ai_support': False,
-                'has_remote_access': False,
-                'has_integrations': False,
-                'has_analytics': False,
-                'has_priority_support': False,
-                'features': [
-                    'Up to 2 devices',
-                    '10 tickets per month',
-                    '1GB storage',
-                    'Email support',
-                    'Basic reporting'
-                ],
-                'is_active': True,
-                'is_popular': False,
-                'trial_days': 0,
-                'sort_order': 1,
-            },
             {
                 'name': 'Starter',
                 'slug': 'starter',
-                'description': 'For growing teams with basic IT support needs',
-                'price': Decimal('29.99'),
-                'currency': 'USD',
+                'description': 'Perfect for small teams getting started with IT automation',
+                'price': Decimal('35000.00'),  # ₦35,000/month
+                'currency': 'NGN',
                 'billing_interval': 'MONTHLY',
-                'max_users': 5,
-                'max_devices': 25,
-                'max_tickets_per_month': 100,
-                'max_storage_gb': 10,
+                'max_users': 10,
+                'max_devices': 50,
+                'max_tickets_per_month': 1000,
+                'max_storage_gb': 5,
                 'has_ai_support': True,
                 'has_remote_access': False,
-                'has_integrations': True,
+                'has_integrations': False,
                 'has_analytics': True,
                 'has_priority_support': False,
                 'features': [
-                    'Up to 5 users',
-                    '25 devices',
-                    '100 tickets/month',
-                    '10GB storage',
-                    'AI-powered diagnostics',
-                    'Cloud integrations',
-                    'Analytics dashboard',
-                    'Email & chat support',
-                    '14-day free trial'
+                    'Up to 50 devices',
+                    'AI chatbot (1,000 messages/month)',
+                    'Basic ticketing system',
+                    'Email support',
+                    'Real-time monitoring',
+                    'Mobile app access',
+                    '5 GB storage',
+                    'Basic analytics'
                 ],
                 'is_active': True,
-                'is_popular': True,
+                'is_popular': False,
                 'trial_days': 14,
-                'sort_order': 2,
+                'sort_order': 1,
             },
             {
                 'name': 'Professional',
                 'slug': 'professional',
-                'description': 'Advanced features for professional IT teams',
-                'price': Decimal('99.99'),
-                'currency': 'USD',
+                'description': 'For growing teams that need advanced features and integrations',
+                'price': Decimal('120000.00'),  # ₦120,000/month
+                'currency': 'NGN',
                 'billing_interval': 'MONTHLY',
-                'max_users': 25,
-                'max_devices': 100,
-                'max_tickets_per_month': 500,
+                'max_users': 50,
+                'max_devices': 500,
+                'max_tickets_per_month': 10000,
                 'max_storage_gb': 50,
                 'has_ai_support': True,
                 'has_remote_access': True,
@@ -94,54 +66,95 @@ class Command(BaseCommand):
                 'has_analytics': True,
                 'has_priority_support': True,
                 'features': [
-                    'Up to 25 users',
-                    '100 devices',
-                    '500 tickets/month',
-                    '50GB storage',
-                    'AI-powered diagnostics',
-                    'Remote access & control',
-                    'All integrations',
-                    'Advanced analytics',
-                    'Priority support (24/7)',
+                    'Up to 500 devices',
+                    'AI chatbot (10,000 messages/month)',
+                    'Advanced ticketing with automation',
+                    'Priority support (24/5)',
+                    'Real-time monitoring & alerts',
+                    'Mobile app access',
+                    'Remote access (RDP/SSH)',
+                    '50 GB storage',
+                    'Advanced analytics & reporting',
                     'Custom workflows',
-                    '14-day free trial'
+                    'API access',
+                    'SSO integration',
+                    'Slack/Teams integration'
                 ],
                 'is_active': True,
-                'is_popular': False,
+                'is_popular': True,  # MOST POPULAR as per frontend
                 'trial_days': 14,
-                'sort_order': 3,
+                'sort_order': 2,
             },
             {
                 'name': 'Enterprise',
                 'slug': 'enterprise',
-                'description': 'Custom solutions for large organizations',
-                'price': Decimal('299.99'),
-                'currency': 'USD',
+                'description': 'For large organizations requiring enterprise-grade features',
+                'price': Decimal('360000.00'),  # ₦360,000/month
+                'currency': 'NGN',
                 'billing_interval': 'MONTHLY',
                 'max_users': 999,
                 'max_devices': 9999,
                 'max_tickets_per_month': 99999,
-                'max_storage_gb': 500,
+                'max_storage_gb': 999,
                 'has_ai_support': True,
                 'has_remote_access': True,
                 'has_integrations': True,
                 'has_analytics': True,
                 'has_priority_support': True,
                 'features': [
-                    'Unlimited users',
                     'Unlimited devices',
-                    'Unlimited tickets',
-                    '500GB storage',
-                    'AI-powered diagnostics',
-                    'Remote access & control',
-                    'All integrations',
-                    'Advanced analytics',
-                    'Dedicated support manager',
-                    'Custom SLA',
-                    'SSO & advanced security',
-                    'API access',
+                    'AI chatbot (unlimited)',
+                    'Enterprise ticketing suite',
+                    '24/7 priority support',
+                    'Real-time monitoring & predictive alerts',
+                    'Mobile app access',
+                    'Remote access (RDP/SSH/VNC)',
+                    'Unlimited storage',
+                    'Custom analytics & dashboards',
+                    'Advanced automation & workflows',
+                    'Full API access',
+                    'SSO & SAML integration',
+                    'All integrations included',
+                    'White-labeling',
+                    'Dedicated infrastructure',
+                    '99.9% SLA guarantee',
+                    'Dedicated account manager',
+                    'Custom training sessions',
+                    'GDPR/HIPAA compliance tools'
+                ],
+                'is_active': True,
+                'is_popular': False,
+                'is_custom': False,
+                'trial_days': 14,
+                'sort_order': 3,
+            },
+            {
+                'name': 'Custom',
+                'slug': 'custom',
+                'description': 'Tailored solutions for unique enterprise requirements',
+                'price': Decimal('0.00'),  # Custom pricing - contact sales
+                'currency': 'NGN',
+                'billing_interval': 'MONTHLY',
+                'max_users': 9999,
+                'max_devices': 99999,
+                'max_tickets_per_month': 999999,
+                'max_storage_gb': 9999,
+                'has_ai_support': True,
+                'has_remote_access': True,
+                'has_integrations': True,
+                'has_analytics': True,
+                'has_priority_support': True,
+                'features': [
+                    'Everything in Enterprise, plus:',
+                    'Custom feature development',
+                    'On-premise deployment option',
+                    'Custom SLA agreements',
+                    'Dedicated support team',
                     'Custom integrations',
-                    'Onboarding & training'
+                    'Multi-region deployment',
+                    'Advanced security features',
+                    'Compliance certifications',
+                    'Custom contract terms'
                 ],
                 'is_active': True,
                 'is_popular': False,
@@ -162,18 +175,20 @@ class Command(BaseCommand):
             if created:
                 plans_created += 1
                 self.stdout.write(
-                    self.style.SUCCESS(f'  ✓ Created plan: {plan.name}')
+                    self.style.SUCCESS(f'  ✓ Created plan: {plan.name} - ₦{plan.price:,.0f}/month')
                 )
             else:
                 plans_updated += 1
                 self.stdout.write(
-                    self.style.WARNING(f'  ↻ Updated plan: {plan.name}')
+                    self.style.WARNING(f'  ↻ Updated plan: {plan.name} - ₦{plan.price:,.0f}/month')
                 )
 
         self.stdout.write('')
         self.stdout.write(
             self.style.SUCCESS(
-                f'Successfully seeded {plans_created} plans '
-                f'(updated {plans_updated} existing)'
+                f'Successfully seeded {plans_created} plans (updated {plans_updated} existing)'
             )
+        )
+        self.stdout.write(
+            self.style.SUCCESS('✓ All plans now match frontend pricing in Naira (NGN)')
         )
