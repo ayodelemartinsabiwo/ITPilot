@@ -1,10 +1,10 @@
 [phases.setup]
-nixPkgs = ["python311", "postgresql"]
+nixPkgs = ["python311", "python311Packages.pip", "postgresql"]
 
 [phases.install]
 cmds = [
-  "cd backend && python -m pip install --upgrade pip",
-  "cd backend && python -m pip install -r requirements.txt"
+  "cd backend && pip install --upgrade pip",
+  "cd backend && pip install -r requirements.txt"
 ]
 
 [phases.build]
@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = "cd backend && python -m daphne -b 0.0.0.0 -p $PORT core.asgi:application"
+cmd = "cd backend && daphne -b 0.0.0.0 -p $PORT core.asgi:application"
