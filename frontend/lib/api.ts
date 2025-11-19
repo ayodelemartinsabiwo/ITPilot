@@ -241,22 +241,22 @@ export const usersAPI = {
 
 export const billingAPI = {
   getPlans: () =>
-    api.get('/v1/billing/plans/'),
+    api.get('/billing/plans/'),
 
   getMySubscription: () =>
-    api.get('/v1/billing/subscriptions/my-subscription/'),
+    api.get('/billing/subscriptions/my-subscription/'),
 
   subscribe: (data: { plan_id: string; payment_method?: string }) =>
-    api.post('/v1/billing/subscribe/', data),
+    api.post('/billing/subscribe/', data),
 
   cancelSubscription: (id: string) =>
-    api.post(`/v1/billing/subscriptions/${id}/cancel/`),
+    api.post(`/billing/subscriptions/${id}/cancel/`),
 
   getInvoices: (params?: { page?: number }) =>
-    api.get('/v1/billing/invoices/', { params }),
+    api.get('/billing/invoices/', { params }),
 
   getPaymentMethods: () =>
-    api.get('/v1/billing/payment-methods/'),
+    api.get('/billing/payment-methods/'),
 }
 
 export default api
