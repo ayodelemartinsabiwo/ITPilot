@@ -1,16 +1,18 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "postgresql"]
+nixPkgs = ["python311", "postgresql"]
 
 [phases.install]
 cmds = [
-  "cd backend && pip install -r requirements.txt --break-system-packages"
+  "cd backend && python3 -m venv /opt/venv",
+  "cd backend && /opt/venv/bin/pip install --upgrade pip",
+  "cd backend && /opt/venv/bin/pip install -r requirements.txt"
 ]
 
 [phases.build]
 cmds = [
-  "cd backend && python manage.py collectstatic --noinput",
-  "cd backend && python manage.py migrate --noinput"
+  "cd backend && /opt/venv/bin/python manage.py collectstatic --noinput",
+  "cd backend && /opt/venv/bin/python manage.py migrate --noinput"
 ]
 
 [start]
-cmd = "cd backend && daphne -b 0.0.0.0 -p $PORT core.asgi:application"
+cmd = "cd backend && /opt/venv/bin/daphne -b 0.0.0.0 -p $PORT core.asgi:application"
