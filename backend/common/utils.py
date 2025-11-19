@@ -11,6 +11,7 @@ import string
 import hashlib
 import base64
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ class EmailService:
     @staticmethod
     def send_email(subject, to_email, template_name, context, from_email=None):
         """
-        Send an HTML email using a template.
+        Send an HTML email using a template (synchronous).
 
         Args:
             subject: Email subject
@@ -108,6 +109,28 @@ class EmailService:
         except Exception as e:
             logger.error(f"Error sending email to {to_email}: {str(e)}")
             return False
+
+    @staticmethod
+    def send_email_async(subject, to_email, template_name, context, from_email=None):
+        """
+        Send email asynchronously in a background thread (non-blocking).
+
+        Args:
+            subject: Email subject
+            to_email: Recipient email address (string or list)
+            template_name: Template file name (without extension)
+            context: Context dictionary for template rendering
+            from_email: Sender email (optional)
+
+        Returns:
+            True immediately (actual sending happens in background)
+        """
+        def send_in_thread():
+            EmailService.send_email(subject, to_email, template_name, context, from_email)
+
+        thread = threading.Thread(target=send_in_thread, daemon=True)
+        thread.start()
+        return True
 
 
 class ResponseFormatter:

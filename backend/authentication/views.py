@@ -28,34 +28,47 @@ class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
+        from django.conf import settings
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
+        # Check if email is configured
+        email_configured = bool(settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD)
+
         try:
-            # Generate OTP for email verification
-            otp_code = TokenGenerator.generate_otp()
-            OTPVerification.objects.create(
-                user=user,
-                otp_type='EMAIL',
-                otp_code=otp_code,
-                email_or_phone=user.email,
-                expires_at=timezone.now() + timedelta(minutes=15)
-            )
+            if email_configured:
+                # Generate OTP for email verification
+                otp_code = TokenGenerator.generate_otp()
+                OTPVerification.objects.create(
+                    user=user,
+                    otp_type='EMAIL',
+                    otp_code=otp_code,
+                    email_or_phone=user.email,
+                    expires_at=timezone.now() + timedelta(minutes=15)
+                )
 
-            # Send verification email (non-blocking - don't fail registration if email fails)
-            email_sent = EmailService.send_email(
-                subject='Verify your ITPilot account',
-                to_email=user.email,
-                template_name='email_verification',
-                context={'user': user, 'otp_code': otp_code}
-            )
+                # Send verification email asynchronously (non-blocking)
+                EmailService.send_email_async(
+                    subject='Verify your ITPilot account',
+                    to_email=user.email,
+                    template_name='email_verification',
+                    context={'user': user, 'otp_code': otp_code}
+                )
 
-            message = 'User registered successfully. Please check your email for verification code.' if email_sent else 'User registered successfully. Email verification is currently unavailable.'
+                message = 'User registered successfully. Please check your email for verification code.'
+            else:
+                # Email not configured - auto-verify user
+                user.is_email_verified = True
+                user.save()
+                message = 'User registered successfully. You can log in now.'
+
         except Exception as e:
-            # Log error but don't fail registration
+            # Log error but don't fail registration - auto-verify on error
             import logging
             logging.error(f"Error during OTP/email process: {str(e)}")
+            user.is_email_verified = True
+            user.save()
             message = 'User registered successfully. You can log in now.'
 
         return Response({
@@ -176,8 +189,8 @@ class PasswordResetRequestView(views.APIView):
             expires_at=timezone.now() + timedelta(minutes=15)
         )
 
-        # Send reset email
-        EmailService.send_email(
+        # Send reset email asynchronously (non-blocking)
+        EmailService.send_email_async(
             subject='Password Reset - ITPilot',
             to_email=user.email,
             template_name='password_reset',
