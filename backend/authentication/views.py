@@ -29,9 +29,37 @@ class UserRegistrationView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         from django.conf import settings
+        from django.utils.text import slugify
+        from organizations.models import Organization, OrganizationMember
+        import uuid
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+
+        # Create default organization for the user
+        try:
+            org_name = f"{user.first_name} {user.last_name}'s Organization"
+            org_slug = slugify(f"{user.email}-{uuid.uuid4().hex[:8]}")
+
+            organization = Organization.objects.create(
+                name=org_name,
+                slug=org_slug,
+                email=user.email,
+                is_active=True,
+                is_verified=True,  # Auto-verify for new users
+            )
+
+            # Add user as owner of the organization
+            OrganizationMember.objects.create(
+                organization=organization,
+                user=user,
+                role='OWNER',
+                is_active=True,
+            )
+        except Exception as e:
+            import logging
+            logging.error(f"Error creating organization for user {user.email}: {str(e)}")
 
         # Check if email is configured
         email_configured = bool(settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD)
