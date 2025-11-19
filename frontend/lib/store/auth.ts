@@ -122,7 +122,7 @@ export const useAuthStore = create<AuthState>()(
           } else {
             throw new Error('Failed to load user profile')
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Load user error:', error)
           // Don't clear tokens or auth state on profile load error
           // User might just have network issues
