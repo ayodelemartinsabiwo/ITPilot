@@ -1,63 +1,11 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import AuthService, { User } from './auth'
-import wsManager from './websocket'
 
-// Auth Store
-interface AuthState {
-  user: User | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  setUser: (user: User | null) => void
-  setAuthenticated: (value: boolean) => void
-  setLoading: (value: boolean) => void
-  login: (user: User, tokens: { access: string; refresh: string }) => void
-  logout: () => void
-  initAuth: () => void
-}
+// Re-export the new auth store
+export { useAuthStore } from './store/auth'
 
-export const useAuthStore = create<AuthState>()(
-  devtools(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      isLoading: true,
-
-      setUser: (user) => set({ user }),
-
-      setAuthenticated: (value) => set({ isAuthenticated: value }),
-
-      setLoading: (value) => set({ isLoading: value }),
-
-      login: (user, tokens) => {
-        AuthService.setTokens(tokens)
-        AuthService.setUser(user)
-        wsManager.connect(tokens.access)
-        set({ user, isAuthenticated: true, isLoading: false })
-      },
-
-      logout: () => {
-        AuthService.clearAuth()
-        wsManager.disconnect()
-        set({ user: null, isAuthenticated: false })
-      },
-
-      initAuth: () => {
-        const isAuth = AuthService.isAuthenticated()
-        const user = AuthService.getUser()
-
-        if (isAuth && user) {
-          wsManager.connect()
-          set({ user, isAuthenticated: true, isLoading: false })
-        } else {
-          AuthService.clearAuth()
-          set({ user: null, isAuthenticated: false, isLoading: false })
-        }
-      },
-    }),
-    { name: 'auth-store' }
-  )
-)
+// Re-export types if needed
+export type { User } from './api/services/auth.service'
 
 // UI Store
 interface UIState {
