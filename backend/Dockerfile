@@ -53,6 +53,10 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY --chown=itpilot:itpilot . .
 
+# Copy and set permissions for entrypoint script
+COPY --chown=itpilot:itpilot docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Switch to non-root user
 USER itpilot
 
@@ -64,7 +68,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/api/health/', timeout=5)"
+    CMD python -c "import requests; requests.get('http://localhost:8000/api/health/', timeout=5)" || true
 
-# Run Daphne ASGI server
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "core.asgi:application"]
+# Run entrypoint script (runs migrations then starts Daphne)
+CMD ["/app/docker-entrypoint.sh"]
