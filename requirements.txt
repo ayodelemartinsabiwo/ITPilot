@@ -1,0 +1,6 @@
+# ITPilot Backend Dependencies
+# This file helps Railway detect this as a Python project
+# Actual dependencies are in backend/requirements.txt
+
+# Install from backend folder
+-r backend/requirements.txt

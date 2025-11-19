@@ -1,19 +1,16 @@
-[build]
-workdir = "backend"
-
-[start]
-cmd = "daphne -b 0.0.0.0 -p $PORT core.asgi:application"
-
 [phases.setup]
 nixPkgs = ["python311", "postgresql"]
 
 [phases.install]
 cmds = [
-  "pip install -r requirements.txt"
+  "cd backend && pip install -r requirements.txt"
 ]
 
 [phases.build]
 cmds = [
-  "python manage.py collectstatic --noinput",
-  "python manage.py migrate --noinput"
+  "cd backend && python manage.py collectstatic --noinput",
+  "cd backend && python manage.py migrate --noinput"
 ]
+
+[start]
+cmd = "cd backend && daphne -b 0.0.0.0 -p $PORT core.asgi:application"
