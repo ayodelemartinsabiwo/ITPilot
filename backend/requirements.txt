@@ -88,6 +88,7 @@ pycryptodome==3.20.0
 
 # AI/ML Integration (for chatbot)
 openai==1.12.0  # For GPT integration
+anthropic==0.23.1  # For Claude AI integration
 langchain==0.1.8
 langchain-openai==0.0.5
 

@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Q
+from django.conf import settings
 from organizations.models import OrganizationMember
 from .models import ChatSession, ChatMessage, AIResponse, KnowledgeBase
 from .serializers import (
@@ -19,6 +20,7 @@ from .serializers import (
     MarkHelpfulSerializer
 )
 import time
+import anthropic
 
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
@@ -86,7 +88,7 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             session=session,
             role='AI',
             content=ai_response_text,
-            model='gpt-3.5-turbo',  # Example model
+            model=settings.CLAUDE_MODEL,
             response_time_ms=response_time_ms
         )
 
@@ -103,10 +105,48 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_201_CREATED)
 
     def _generate_ai_response(self, user_message, session):
-        """Generate AI response (placeholder for OpenAI integration)."""
-        # TODO: Implement actual OpenAI API integration
-        # This is a placeholder response
-        return f"I understand you said: '{user_message}'. How can I assist you further with your IT support needs?"
+        """Generate AI response using Claude AI."""
+        try:
+            # Initialize Claude client
+            client = anthropic.Anthropic(api_key=settings.CLAUDE_API_KEY)
+
+            # Get conversation history for context
+            previous_messages = ChatMessage.objects.filter(
+                session=session
+            ).order_by('created_at')[:10]  # Last 10 messages for context
+
+            # Build conversation history
+            conversation_history = []
+            for msg in previous_messages:
+                conversation_history.append({
+                    "role": "user" if msg.role == "USER" else "assistant",
+                    "content": msg.content
+                })
+
+            # Add current message
+            conversation_history.append({
+                "role": "user",
+                "content": user_message
+            })
+
+            # Create Claude API request
+            message = client.messages.create(
+                model=settings.CLAUDE_MODEL,
+                max_tokens=settings.CLAUDE_MAX_TOKENS,
+                system="You are an expert IT support assistant. Help users with their technical issues, provide clear solutions, and guide them through troubleshooting steps. Be friendly, professional, and concise.",
+                messages=conversation_history
+            )
+
+            # Extract response text
+            response_text = message.content[0].text
+            return response_text
+
+        except Exception as e:
+            # Log error and return fallback response
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Claude API error: {str(e)}")
+            return "I apologize, but I'm having trouble processing your request at the moment. Please try again or contact support if the issue persists."
 
     @action(detail=True, methods=['post'])
     def end_session(self, request, pk=None):

@@ -481,6 +481,11 @@ OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 OPENAI_MODEL = env('OPENAI_MODEL', default='gpt-4-turbo-preview')
 OPENAI_MAX_TOKENS = env.int('OPENAI_MAX_TOKENS', default=2000)
 
+# Claude AI Configuration (Anthropic)
+CLAUDE_API_KEY = env('CLAUDE_API_KEY', default='')
+CLAUDE_MODEL = env('CLAUDE_MODEL', default='claude-3-5-sonnet-20241022')
+CLAUDE_MAX_TOKENS = env.int('CLAUDE_MAX_TOKENS', default=4096)
+
 # Payment Gateway Settings
 STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY', default='')
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY', default='')

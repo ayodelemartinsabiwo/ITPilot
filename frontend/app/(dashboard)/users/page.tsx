@@ -154,11 +154,13 @@ export default function UsersPage() {
                       {(user.full_name || user.first_name || user.email).charAt(0).toUpperCase()}
                     </div>
                     <div className="flex items-center gap-2">
-                      {user.is_active ? (
-                        <UserCheck className="w-5 h-5 text-green-500" title="Active" />
-                      ) : (
-                        <UserX className="w-5 h-5 text-red-500" title="Inactive" />
-                      )}
+                      <div title={user.is_active ? 'Active' : 'Inactive'}>
+                        {user.is_active ? (
+                          <UserCheck className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <UserX className="w-5 h-5 text-red-500" />
+                        )}
+                      </div>
                       <button className="p-2 rounded-lg hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
                         <MoreVertical className="w-4 h-4" />
                       </button>
