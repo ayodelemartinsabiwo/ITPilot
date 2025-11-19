@@ -16,6 +16,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Seeding subscription plans (matching frontend in Naira)...')
 
+        # Delete/deactivate old plans not in frontend (e.g., Free plan)
+        old_plans = Plan.objects.exclude(slug__in=['starter', 'professional', 'enterprise', 'custom'])
+        if old_plans.exists():
+            deleted_count = old_plans.count()
+            old_plans.delete()
+            self.stdout.write(
+                self.style.WARNING(f'  🗑️  Deleted {deleted_count} old plan(s) not in frontend')
+            )
+
         # Plans matching frontend/app/pricing/page.tsx - ALL IN NAIRA (NGN)
         plans_data = [
             {

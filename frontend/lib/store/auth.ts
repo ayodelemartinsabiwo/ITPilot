@@ -18,6 +18,7 @@ interface AuthState {
   register: (data: RegisterRequest) => Promise<void>
   logout: () => Promise<void>
   loadUser: () => Promise<void>
+  initAuth: () => Promise<void>
   clearError: () => void
   setUser: (user: User | null) => void
 }
@@ -130,6 +131,14 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+        }
+      },
+
+      initAuth: async () => {
+        // Initialize auth state on app load
+        // Load user if tokens exist
+        if (authService.isAuthenticated()) {
+          await get().loadUser()
         }
       },
 
