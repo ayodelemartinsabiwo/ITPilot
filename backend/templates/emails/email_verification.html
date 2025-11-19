@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - ITPilot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .otp-code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+            letter-spacing: 8px;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to ITPilot!</h1>
+            <p>Please verify your email address</p>
+        </div>
+
+        <p>Hello {{ user.first_name|default:user.email }},</p>
+
+        <p>Thank you for registering with ITPilot. To complete your registration, please use the verification code below:</p>
+
+        <div class="otp-code">{{ otp_code }}</div>
+
+        <p>This code will expire in 15 minutes.</p>
+
+        <p>If you didn't create an account with ITPilot, please ignore this email.</p>
+
+        <div class="footer">
+            <p>&copy; 2024 ITPilot. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
