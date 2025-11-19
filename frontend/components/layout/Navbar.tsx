@@ -120,10 +120,10 @@ export function Navbar() {
                     className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium text-sm">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.full_name || user.first_name || user.email).charAt(0).toUpperCase()}
                     </div>
                     <span className="hidden lg:block text-sm font-medium text-gray-700">
-                      {user.name}
+                      {user.full_name || `${user.first_name} ${user.last_name}`.trim() || user.email}
                     </span>
                   </button>
 
@@ -142,7 +142,7 @@ export function Navbar() {
                       >
                         <div className="px-4 py-3 border-b border-gray-100">
                           <p className="text-sm font-medium text-gray-900">
-                            {user.name}
+                            {user.full_name || `${user.first_name} ${user.last_name}`.trim() || user.email}
                           </p>
                           <p className="text-xs text-gray-500">{user.email}</p>
                         </div>
