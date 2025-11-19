@@ -10,10 +10,13 @@ export type { User } from './api/services/auth.service'
 // UI Store
 interface UIState {
   sidebarOpen: boolean
+  sidebarCollapsed: boolean
   theme: 'light' | 'dark'
   notifications: Notification[]
   setSidebarOpen: (open: boolean) => void
   toggleSidebar: () => void
+  setSidebarCollapsed: (collapsed: boolean) => void
+  toggleSidebarCollapse: () => void
   setTheme: (theme: 'light' | 'dark') => void
   addNotification: (notification: Omit<Notification, 'id'>) => void
   removeNotification: (id: string) => void
@@ -34,12 +37,17 @@ export const useUIStore = create<UIState>()(
     persist(
       (set) => ({
         sidebarOpen: true,
+        sidebarCollapsed: false,
         theme: 'light',
         notifications: [],
 
         setSidebarOpen: (open) => set({ sidebarOpen: open }),
 
         toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+
+        setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+
+        toggleSidebarCollapse: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
         setTheme: (theme) => set({ theme }),
 

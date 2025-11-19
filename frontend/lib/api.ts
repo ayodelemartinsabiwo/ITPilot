@@ -239,4 +239,24 @@ export const usersAPI = {
     }),
 }
 
+export const billingAPI = {
+  getPlans: () =>
+    api.get('/v1/billing/plans/'),
+
+  getMySubscription: () =>
+    api.get('/v1/billing/subscriptions/my-subscription/'),
+
+  subscribe: (data: { plan_id: string; payment_method?: string }) =>
+    api.post('/v1/billing/subscribe/', data),
+
+  cancelSubscription: (id: string) =>
+    api.post(`/v1/billing/subscriptions/${id}/cancel/`),
+
+  getInvoices: (params?: { page?: number }) =>
+    api.get('/v1/billing/invoices/', { params }),
+
+  getPaymentMethods: () =>
+    api.get('/v1/billing/payment-methods/'),
+}
+
 export default api
