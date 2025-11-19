@@ -48,6 +48,10 @@ export default function LoginPage() {
       reset()
 
       toast.success('Welcome back!')
+
+      // Small delay to ensure state is persisted before navigation
+      await new Promise(resolve => setTimeout(resolve, 100))
+
       router.push('/dashboard')
     } catch (err: any) {
       console.error('Login error:', err)

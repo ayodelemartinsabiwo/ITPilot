@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Navbar } from '@/components/layout/Navbar'
 import { useAuthStore } from '@/lib/store'
+import { authService } from '@/lib/api/services/auth.service'
 
 export default function DashboardLayout({
   children,
@@ -12,15 +13,28 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuthStore()
+  const { isAuthenticated, isLoading, loadUser } = useAuthStore()
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Mark as hydrated after mount (Zustand persist rehydration)
+    setIsHydrated(true)
+
+    // If we have tokens but no auth state, load user
+    if (authService.isAuthenticated() && !isAuthenticated) {
+      loadUser()
+    }
+  }, [])
+
+  useEffect(() => {
+    // Only redirect if hydrated, not loading, and not authenticated
+    if (isHydrated && !isLoading && !isAuthenticated && !authService.isAuthenticated()) {
       router.push('/login')
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, isHydrated, router])
 
-  if (isLoading) {
+  // Show loading while hydrating or loading user
+  if (!isHydrated || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -33,7 +47,8 @@ export default function DashboardLayout({
     )
   }
 
-  if (!isAuthenticated) {
+  // Show nothing while redirecting
+  if (!isAuthenticated && !authService.isAuthenticated()) {
     return null
   }
 

@@ -124,20 +124,31 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           console.error('Load user error:', error)
-          clearTokens()
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          })
+          // Don't clear tokens or auth state on profile load error
+          // User might just have network issues
+          // Only clear if it's an auth error (401)
+          if (error?.response?.status === 401) {
+            clearTokens()
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: null,
+            })
+          } else {
+            // Keep user logged in, just set loading to false
+            set({
+              isLoading: false,
+            })
+          }
         }
       },
 
       initAuth: async () => {
         // Initialize auth state on app load
-        // Load user if tokens exist
-        if (authService.isAuthenticated()) {
+        // Only load user if tokens exist and we don't already have user data
+        const currentState = get()
+        if (authService.isAuthenticated() && !currentState.user) {
           await get().loadUser()
         }
       },
