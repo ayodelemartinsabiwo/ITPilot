@@ -1,8 +1,0 @@
-[build]
-builder = "NIXPACKS"
-buildCommand = "cd backend && python3 -m venv /opt/venv && /opt/venv/bin/pip install --upgrade pip && /opt/venv/bin/pip install -r requirements.txt && /opt/venv/bin/python manage.py collectstatic --noinput && /opt/venv/bin/python manage.py migrate --noinput"
-
-[deploy]
-startCommand = "bash -c 'cd backend && /opt/venv/bin/daphne -b 0.0.0.0 -p ${PORT} core.asgi:application'"
-healthcheckPath = "/admin/"
-restartPolicyType = "ON_FAILURE"
