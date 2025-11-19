@@ -89,7 +89,7 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           await authService.logout()
-        } catch (error) {
+        } catch (error: any) {
           console.error('Logout error:', error)
         } finally {
           clearTokens()
