@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
+import { CreateTicketModal } from '@/components/modals/CreateTicketModal'
 import { ticketsAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
 
@@ -24,6 +25,7 @@ export default function TicketsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const { data: ticketsData, isLoading } = useQuery({
     queryKey: ['tickets', searchQuery, statusFilter, priorityFilter],
@@ -65,7 +67,10 @@ export default function TicketsPage() {
             Manage and track support tickets
           </p>
         </div>
-        <Button leftIcon={<Plus className="w-5 h-5" />}>
+        <Button
+          leftIcon={<Plus className="w-5 h-5" />}
+          onClick={() => setShowCreateModal(true)}
+        >
           Create Ticket
         </Button>
       </div>
@@ -223,12 +228,21 @@ export default function TicketsPage() {
             <p className="text-gray-600 mb-6">
               Get started by creating your first ticket
             </p>
-            <Button leftIcon={<Plus className="w-5 h-5" />}>
+            <Button
+              leftIcon={<Plus className="w-5 h-5" />}
+              onClick={() => setShowCreateModal(true)}
+            >
               Create Ticket
             </Button>
           </CardContent>
         </Card>
       )}
+
+      {/* Create Ticket Modal */}
+      <CreateTicketModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
     </div>
   )
 }

@@ -17,12 +17,14 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
+import { AddDeviceModal } from '@/components/modals/AddDeviceModal'
 import { devicesAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
 
 export default function DevicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [showAddModal, setShowAddModal] = useState(false)
 
   const { data: devicesData, isLoading } = useQuery({
     queryKey: ['devices', searchQuery, statusFilter],
@@ -48,7 +50,10 @@ export default function DevicesPage() {
             Manage and monitor all your IT devices
           </p>
         </div>
-        <Button leftIcon={<Plus className="w-5 h-5" />}>
+        <Button
+          leftIcon={<Plus className="w-5 h-5" />}
+          onClick={() => setShowAddModal(true)}
+        >
           Add Device
         </Button>
       </div>
@@ -188,12 +193,21 @@ export default function DevicesPage() {
             <p className="text-gray-600 mb-6">
               Get started by adding your first device
             </p>
-            <Button leftIcon={<Plus className="w-5 h-5" />}>
+            <Button
+              leftIcon={<Plus className="w-5 h-5" />}
+              onClick={() => setShowAddModal(true)}
+            >
               Add Device
             </Button>
           </CardContent>
         </Card>
       )}
+
+      {/* Add Device Modal */}
+      <AddDeviceModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
     </div>
   )
 }

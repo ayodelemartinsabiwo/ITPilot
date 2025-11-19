@@ -86,6 +86,47 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    @action(detail=False, methods=['get'], url_path='my-subscription')
+    def my_subscription(self, request):
+        """Get current user's active subscription."""
+        user = request.user
+
+        # Try to find user's active subscription
+        subscription = Subscription.objects.filter(
+            user=user,
+            status='ACTIVE'
+        ).select_related('plan').first()
+
+        # If no direct subscription, check organization subscription
+        if not subscription:
+            user_orgs = OrganizationMember.objects.filter(
+                user=user,
+                is_active=True
+            ).values_list('organization_id', flat=True)
+
+            subscription = Subscription.objects.filter(
+                organization_id__in=user_orgs,
+                status='ACTIVE'
+            ).select_related('plan', 'organization').first()
+
+        if not subscription:
+            return Response(
+                {
+                    'success': True,
+                    'subscription': None,
+                    'message': 'No active subscription found'
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {
+                'success': True,
+                'subscription': SubscriptionSerializer(subscription).data
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for Payment read operations."""
