@@ -43,6 +43,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -67,6 +68,9 @@ export default function RegisterPage() {
 
       setSuccess(true)
       toast.success('Account created successfully! Please check your email to verify your account.')
+
+      // Clear form fields
+      reset()
 
       // Redirect to login after a short delay
       setTimeout(() => {

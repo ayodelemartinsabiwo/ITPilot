@@ -31,6 +31,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -42,6 +43,9 @@ export default function LoginPage() {
       setError('')
 
       await login(data)
+
+      // Clear form fields
+      reset()
 
       toast.success('Welcome back!')
       router.push('/dashboard')
