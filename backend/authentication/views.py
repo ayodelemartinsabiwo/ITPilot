@@ -32,27 +32,35 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # Generate OTP for email verification
-        otp_code = TokenGenerator.generate_otp()
-        OTPVerification.objects.create(
-            user=user,
-            otp_type='EMAIL',
-            otp_code=otp_code,
-            email_or_phone=user.email,
-            expires_at=timezone.now() + timedelta(minutes=15)
-        )
+        try:
+            # Generate OTP for email verification
+            otp_code = TokenGenerator.generate_otp()
+            OTPVerification.objects.create(
+                user=user,
+                otp_type='EMAIL',
+                otp_code=otp_code,
+                email_or_phone=user.email,
+                expires_at=timezone.now() + timedelta(minutes=15)
+            )
 
-        # Send verification email
-        EmailService.send_email(
-            subject='Verify your ITPilot account',
-            to_email=user.email,
-            template_name='email_verification',
-            context={'user': user, 'otp_code': otp_code}
-        )
+            # Send verification email (non-blocking - don't fail registration if email fails)
+            email_sent = EmailService.send_email(
+                subject='Verify your ITPilot account',
+                to_email=user.email,
+                template_name='email_verification',
+                context={'user': user, 'otp_code': otp_code}
+            )
+
+            message = 'User registered successfully. Please check your email for verification code.' if email_sent else 'User registered successfully. Email verification is currently unavailable.'
+        except Exception as e:
+            # Log error but don't fail registration
+            import logging
+            logging.error(f"Error during OTP/email process: {str(e)}")
+            message = 'User registered successfully. You can log in now.'
 
         return Response({
             'success': True,
-            'message': 'User registered successfully. Please check your email for verification code.',
+            'message': message,
             'data': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
 
