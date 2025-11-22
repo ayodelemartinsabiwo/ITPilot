@@ -33,6 +33,20 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
 
+    // Check if error response is HTML (not JSON)
+    const contentType = error.response?.headers['content-type']
+    if (contentType && contentType.includes('text/html')) {
+      console.error('Received HTML response instead of JSON:', {
+        url: originalRequest.url,
+        status: error.response?.status,
+      })
+      // Don't show HTML errors to user
+      return Promise.reject({
+        message: 'This feature is not yet available',
+        status: error.response?.status,
+      })
+    }
+
     // Handle 401 errors - Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true

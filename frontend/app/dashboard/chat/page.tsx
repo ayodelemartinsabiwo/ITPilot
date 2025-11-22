@@ -39,9 +39,16 @@ export default function ChatPage() {
   const { data: conversations } = useQuery({
     queryKey: ['conversations'],
     queryFn: async () => {
-      const response = await chatAPI.getConversations()
-      return response.data
+      try {
+        const response = await chatAPI.getConversations()
+        return response.data
+      } catch (error) {
+        console.error('Failed to fetch conversations:', error)
+        return []
+      }
     },
+    enabled: false, // Disable auto-fetch until backend endpoint is ready
+    initialData: [],
   })
 
   const sendMessageMutation = useMutation({
