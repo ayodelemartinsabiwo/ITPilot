@@ -66,6 +66,10 @@ INSTALLED_APPS = [
     'remote_access',
     'billing',
     'notifications',
+    # New apps for dashboard restructuring
+    'ai_diagnostics',
+    'network_security',
+    'admin_controls',
 ]
 
 MIDDLEWARE = [
