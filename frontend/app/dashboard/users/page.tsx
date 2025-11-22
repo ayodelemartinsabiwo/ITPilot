@@ -36,9 +36,16 @@ export default function UsersPage() {
       if (searchQuery) params.search = searchQuery
       if (roleFilter !== 'all') params.role = roleFilter
 
-      const response = await usersAPI.getAll(params)
-      return response.data
+      try {
+        const response = await usersAPI.getAll(params)
+        return response.data
+      } catch (error) {
+        console.error('Failed to fetch users:', error)
+        return { results: [] }
+      }
     },
+    enabled: false, // Disable auto-fetch until backend endpoint is ready
+    initialData: { results: [] },
   })
 
   const users = usersData?.results || []
