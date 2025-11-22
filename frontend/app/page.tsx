@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Bot, Shield, Zap, BarChart3, Clock, Users } from 'lucide-react'
+import { ArrowRight, Bot, Shield, Zap, BarChart3, Clock, Users, Monitor, Mail, Activity, Settings, Lock, CheckCircle, Download } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Navbar } from '@/components/layout/Navbar'
@@ -125,6 +125,367 @@ export default function LandingPage() {
                 <div className="text-sm text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Main Headline Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <div className="text-4xl mb-4">🚀</div>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-6">
+              Your All-In-One IT Support App — Fast, Easy, Affordable
+            </h2>
+            <p className="text-2xl font-semibold text-orange-600 mb-6">
+              Stop Struggling With Tech Problems. Get Instant Help.
+            </p>
+            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              Whether it's your laptop, office computers, internet, software, or devices acting up — our IT Support App fixes issues fast.
+            </p>
+            <div className="space-y-2 mb-10 text-lg text-gray-700">
+              <p>✓ No IT knowledge needed.</p>
+              <p>✓ No waiting for technicians.</p>
+              <p>✓ Just tap, connect, and get help instantly.</p>
+            </div>
+            <Link href="/register">
+              <Button size="lg" className="group">
+                Start Your Free Trial Today
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Why Thousands Trust Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center mb-16"
+          >
+            <h2 className="text-4xl font-bold text-black mb-4">
+              Why Thousands Trust Our IT Support App
+            </h2>
+            <p className="text-xl text-gray-600">
+              We make IT support simple, affordable, and always available — for homes, small teams, and growing businesses.
+            </p>
+          </motion.div>
+
+          {/* What You Get */}
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-12"
+            >
+              <h3 className="text-3xl font-bold text-black mb-10 text-center">What You Get</h3>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <Card className="p-8 h-full hover:shadow-orange transition-all duration-300">
+                  <div className="text-4xl mb-4">🖥</div>
+                  <h4 className="text-2xl font-semibold text-black mb-3">Instant Remote Fixes</h4>
+                  <p className="text-gray-600 leading-relaxed">
+                    A technician connects to your device and solves the problem immediately — just like they're sitting with you.
+                  </p>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <Card className="p-8 h-full hover:shadow-orange transition-all duration-300">
+                  <div className="text-4xl mb-4">📩</div>
+                  <h4 className="text-2xl font-semibold text-black mb-3">Easy Helpdesk for Any Problem</h4>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Computer slow? Printer not working? Can't connect to the internet?
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    Just open a ticket. We handle the rest.
+                  </p>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <Card className="p-8 h-full hover:shadow-orange transition-all duration-300">
+                  <div className="text-4xl mb-4">📊</div>
+                  <h4 className="text-2xl font-semibold text-black mb-3">Keep Your Devices Healthy</h4>
+                  <p className="text-gray-600 leading-relaxed">
+                    Our app watches your devices 24/7 and warns you before problems happen — so you avoid downtime, data loss, or expensive repairs.
+                  </p>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Card className="p-8 h-full hover:shadow-orange transition-all duration-300">
+                  <div className="text-4xl mb-4">⚡</div>
+                  <h4 className="text-2xl font-semibold text-black mb-3">Save Time With Automation</h4>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    Updates, maintenance, cleanups — done automatically in the background.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    Your devices stay fast and secure.
+                  </p>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="md:col-span-2"
+              >
+                <Card className="p-8 hover:shadow-orange transition-all duration-300">
+                  <div className="text-4xl mb-4">🛡</div>
+                  <h4 className="text-2xl font-semibold text-black mb-3">Strong Protection</h4>
+                  <p className="text-gray-600 leading-relaxed mb-2">
+                    Everything is encrypted and secure. Your data stays safe.
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    Only you and your technician can access your device.
+                  </p>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Perfect For Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto"
+          >
+            <h3 className="text-3xl font-bold text-black mb-8 text-center">Perfect For:</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="flex items-start gap-3"
+              >
+                <CheckCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700">Individuals who want stress-free tech support</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="flex items-start gap-3"
+              >
+                <CheckCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700">Small businesses that can't afford a full IT team</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="flex items-start gap-3"
+              >
+                <CheckCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700">Freelancers and remote workers</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex items-start gap-3"
+              >
+                <CheckCircle className="w-6 h-6 text-orange-500 flex-shrink-0 mt-1" />
+                <p className="text-lg text-gray-700">Shops, schools, churches, offices — anyone who uses computers</p>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h3 className="text-3xl font-bold text-black mb-12">How It Works</h3>
+            <div className="grid md:grid-cols-3 gap-8 mb-10">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="relative"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
+                  1
+                </div>
+                <h4 className="text-xl font-semibold text-black mb-2">Sign Up</h4>
+                <p className="text-gray-600">Create your account in seconds</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="relative"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
+                  2
+                </div>
+                <h4 className="text-xl font-semibold text-black mb-2">Install the App</h4>
+                <p className="text-gray-600">Download via browser search by clicking the app download icon</p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="relative"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg">
+                  3
+                </div>
+                <h4 className="text-xl font-semibold text-black mb-2">Get IT Support</h4>
+                <p className="text-gray-600">Access help anytime you need it</p>
+              </motion.div>
+            </div>
+            <p className="text-lg text-gray-700 font-medium">Simple. Fast. No complications.</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Teaser Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h3 className="text-3xl font-bold text-black mb-6">Pricing That Makes Sense</h3>
+            <p className="text-xl text-gray-600 mb-8">
+              Get professional IT support without paying for a full technician.
+            </p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="bg-orange-50 rounded-lg p-6"
+              >
+                <p className="text-lg font-semibold text-orange-600">⭐ Home users</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-orange-50 rounded-lg p-6"
+              >
+                <p className="text-lg font-semibold text-orange-600">⭐ Small teams</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-orange-50 rounded-lg p-6"
+              >
+                <p className="text-lg font-semibold text-orange-600">⭐ Growing businesses</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="bg-orange-50 rounded-lg p-6"
+              >
+                <p className="text-lg font-semibold text-orange-600">⭐ IT service providers</p>
+              </motion.div>
+            </div>
+            <p className="text-gray-600 mb-8">Affordable monthly pricing. Cancel anytime.</p>
+            <Link href="/pricing">
+              <Button size="lg">
+                See Plans
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pre-CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 to-black text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h2 className="text-4xl font-bold mb-6">Don't Wait Until Something Breaks</h2>
+            <p className="text-xl text-gray-300 mb-10">
+              Enjoy peace of mind knowing your devices are always monitored, protected, and supported.
+            </p>
+            <div className="space-y-4">
+              <p className="text-2xl font-semibold text-orange-400">Try It Free — No Credit Card Required</p>
+              <Link href="/register">
+                <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
+                  Get Started Now
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>
