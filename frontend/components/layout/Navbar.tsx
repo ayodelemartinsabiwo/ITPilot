@@ -19,6 +19,7 @@ export function Navbar() {
   const { toggleSidebar } = useUIStore()
   const [isScrolled, setIsScrolled] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
 
   // Fetch user subscription
   const { data: subscriptionData } = useQuery({
@@ -45,6 +46,36 @@ export function Navbar() {
 
   const subscription = subscriptionData?.subscription
   const planName = subscription?.plan?.name || 'Free'
+
+  // Sample notifications - replace with real API data
+  const notifications = [
+    {
+      id: 1,
+      title: 'System Update',
+      message: 'New system update available',
+      time: '5 min ago',
+      unread: true,
+      type: 'info'
+    },
+    {
+      id: 2,
+      title: 'Security Alert',
+      message: 'Unusual login detected',
+      time: '1 hour ago',
+      unread: true,
+      type: 'warning'
+    },
+    {
+      id: 3,
+      title: 'Device Offline',
+      message: 'Server-01 is offline',
+      time: '2 hours ago',
+      unread: false,
+      type: 'error'
+    }
+  ]
+
+  const unreadCount = notifications.filter(n => n.unread).length
 
   // Plan badge styling based on plan (for navbar - smaller size)
   const getPlanBadge = (size: 'small' | 'normal' = 'normal') => {
@@ -166,14 +197,94 @@ export function Navbar() {
             {isAuthenticated && user ? (
               <>
                 {/* Notifications */}
-                <button
-                  onClick={() => router.push('/dashboard/notifications')}
-                  className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  aria-label="Notifications"
-                >
-                  <Bell className="w-5 h-5 text-gray-700" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="w-5 h-5 text-gray-700" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+                    )}
+                  </button>
+
+                  {/* Notifications Dropdown */}
+                  {showNotifications && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowNotifications(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-hidden"
+                      >
+                        <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                          <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <Badge variant="primary" className="bg-orange-500">
+                              {unreadCount} new
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="overflow-y-auto max-h-80">
+                          {notifications.length === 0 ? (
+                            <div className="p-8 text-center text-gray-500">
+                              <Bell className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                              <p className="text-sm">No notifications</p>
+                            </div>
+                          ) : (
+                            <div className="divide-y divide-gray-100">
+                              {notifications.map((notification) => (
+                                <div
+                                  key={notification.id}
+                                  className={cn(
+                                    'px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer',
+                                    notification.unread && 'bg-orange-50/50'
+                                  )}
+                                >
+                                  <div className="flex gap-3">
+                                    <div className={cn(
+                                      'w-2 h-2 rounded-full mt-2 flex-shrink-0',
+                                      notification.type === 'error' ? 'bg-red-500' :
+                                      notification.type === 'warning' ? 'bg-yellow-500' :
+                                      'bg-blue-500'
+                                    )} />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-gray-900 truncate">
+                                        {notification.title}
+                                      </p>
+                                      <p className="text-xs text-gray-600 mt-0.5">
+                                        {notification.message}
+                                      </p>
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        {notification.time}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+                          <Link
+                            href="/dashboard/notifications"
+                            onClick={() => setShowNotifications(false)}
+                            className="block text-center text-sm font-medium text-orange-500 hover:text-orange-600 transition-colors"
+                          >
+                            View all notifications →
+                          </Link>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </div>
 
                 {/* User Menu with Plan Badge */}
                 <div className="relative">
@@ -221,16 +332,7 @@ export function Navbar() {
                         </div>
 
                         <Link
-                          href="/dashboard"
-                          onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          <User className="w-4 h-4" />
-                          Dashboard
-                        </Link>
-
-                        <Link
-                          href="/settings"
+                          href="/dashboard/settings"
                           onClick={() => setShowUserMenu(false)}
                           className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >

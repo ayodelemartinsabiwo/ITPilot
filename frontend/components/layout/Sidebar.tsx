@@ -157,35 +157,32 @@ export function Sidebar() {
 
           {/* Footer */}
           <div className="border-t border-gray-800 p-4">
+            {/* Dashboard Settings Link */}
             {!sidebarCollapsed ? (
-              <div className="rounded-lg bg-gradient-to-r from-orange-500/10 to-orange-600/10 border border-orange-500/20 p-4">
-                <p className="text-sm font-medium text-white mb-1">
-                  Need Help?
-                </p>
-                <p className="text-xs text-gray-400 mb-3">
-                  Contact our support team
-                </p>
-                <Link
-                  href="/dashboard/chat"
-                  className="block text-center text-sm font-medium text-orange-500 hover:text-orange-400 transition-colors"
-                >
-                  Start Chat →
-                </Link>
-              </div>
+              <Link
+                href="/dashboard/settings"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors mb-3"
+              >
+                <Settings className="w-5 h-5 text-orange-500 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white">Dashboard Settings</p>
+                  <p className="text-xs text-gray-400">Manage preferences</p>
+                </div>
+              </Link>
             ) : (
               <Link
-                href="/dashboard/chat"
-                title="Need Help?"
-                className="flex justify-center p-3 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 transition-colors"
+                href="/dashboard/settings"
+                title="Dashboard Settings"
+                className="flex justify-center p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors mb-3"
               >
-                <MessageSquare className="w-5 h-5 text-orange-500" />
+                <Settings className="w-5 h-5 text-orange-500" />
               </Link>
             )}
 
             {/* Collapse Toggle - Desktop only */}
             <button
               onClick={toggleSidebarCollapse}
-              className="hidden lg:flex items-center justify-center w-full mt-4 p-2 rounded-lg hover:bg-gray-800 transition-colors"
+              className="hidden lg:flex items-center justify-center w-full p-2 rounded-lg hover:bg-gray-800 transition-colors"
               aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {sidebarCollapsed ? (
