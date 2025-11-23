@@ -209,7 +209,7 @@ export default function SecurityNotificationsPage() {
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-gray-900">{alert.title}</p>
                           <Badge variant={
-                            alert.severity === 'critical' ? 'destructive' :
+                            alert.severity === 'critical' ? 'danger' :
                             alert.severity === 'high' ? 'warning' : 'default'
                           }>
                             {alert.severity}
