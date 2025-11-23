@@ -225,7 +225,7 @@ export default function NotificationsPage() {
                         <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                         <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
                       </div>
-                      <Badge variant={notification.type === 'critical' ? 'destructive' : 'default'}>
+                      <Badge variant={notification.type === 'critical' ? 'danger' : 'default'}>
                         {notification.category}
                       </Badge>
                     </div>

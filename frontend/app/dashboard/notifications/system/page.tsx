@@ -194,7 +194,7 @@ export default function SystemNotificationsPage() {
                         <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                         <p className="text-xs text-gray-500 mt-2">{notification.timestamp}</p>
                       </div>
-                      <Badge variant={notification.severity === 'error' ? 'destructive' : 'default'}>
+                      <Badge variant={notification.severity === 'error' ? 'danger' : 'default'}>
                         {notification.severity}
                       </Badge>
                     </div>
