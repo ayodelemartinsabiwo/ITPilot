@@ -169,7 +169,7 @@ export default function LicenseNotificationsPage() {
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-gray-900">{notification.software}</p>
                           <Badge variant={
-                            notification.daysUntilExpiry <= 7 ? 'destructive' :
+                            notification.daysUntilExpiry <= 7 ? 'danger' :
                             notification.daysUntilExpiry <= 30 ? 'warning' : 'default'
                           }>
                             {notification.daysUntilExpiry} days left

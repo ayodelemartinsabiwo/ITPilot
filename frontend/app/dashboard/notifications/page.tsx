@@ -151,7 +151,7 @@ export default function NotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="default" size="sm" className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" size="sm" className="bg-orange-500 hover:bg-orange-600">
               All
             </Button>
             <Button variant="outline" size="sm">
@@ -225,7 +225,7 @@ export default function NotificationsPage() {
                         <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                         <p className="text-xs text-gray-500 mt-2">{notification.time}</p>
                       </div>
-                      <Badge variant={notification.type === 'critical' ? 'destructive' : 'default'}>
+                      <Badge variant={notification.type === 'critical' ? 'danger' : 'default'}>
                         {notification.category}
                       </Badge>
                     </div>

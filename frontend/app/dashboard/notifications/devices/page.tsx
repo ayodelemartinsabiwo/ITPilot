@@ -154,7 +154,7 @@ export default function DeviceNotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="default" size="sm" className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" size="sm" className="bg-orange-500 hover:bg-orange-600">
               All Warnings
             </Button>
             <Button variant="outline" size="sm">
@@ -252,7 +252,7 @@ export default function DeviceNotificationsPage() {
                           <Laptop className="w-4 h-4 text-gray-500" />
                           <p className="font-medium text-gray-900">{warning.deviceName}</p>
                           <Badge variant={
-                            warning.severity === 'critical' ? 'destructive' :
+                            warning.severity === 'critical' ? 'danger' :
                             warning.severity === 'high' ? 'warning' : 'default'
                           }>
                             {warning.severity}
