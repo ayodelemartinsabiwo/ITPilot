@@ -60,7 +60,7 @@ export default function TechnicianQueuePage() {
         <div className="flex gap-2">
           <Button
             onClick={() => setIsQueueActive(!isQueueActive)}
-            variant={isQueueActive ? 'outline' : 'default'}
+            variant={isQueueActive ? 'outline' : 'primary'}
             className={!isQueueActive ? 'bg-orange-500 hover:bg-orange-600' : ''}
           >
             {isQueueActive ? (
