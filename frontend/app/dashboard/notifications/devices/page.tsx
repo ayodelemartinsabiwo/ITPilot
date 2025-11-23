@@ -252,7 +252,7 @@ export default function DeviceNotificationsPage() {
                           <Laptop className="w-4 h-4 text-gray-500" />
                           <p className="font-medium text-gray-900">{warning.deviceName}</p>
                           <Badge variant={
-                            warning.severity === 'critical' ? 'destructive' :
+                            warning.severity === 'critical' ? 'danger' :
                             warning.severity === 'high' ? 'warning' : 'default'
                           }>
                             {warning.severity}
