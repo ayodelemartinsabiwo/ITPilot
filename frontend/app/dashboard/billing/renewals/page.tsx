@@ -175,7 +175,7 @@ export default function RenewalsPage() {
                   <div className="text-right">
                     <p className="font-bold text-gray-900">${renewal.amount}</p>
                     <Badge
-                      variant={renewal.daysUntil <= 7 ? 'destructive' : 'default'}
+                      variant={renewal.daysUntil <= 7 ? 'danger' : 'default'}
                       className="mt-1"
                     >
                       {renewal.daysUntil} days
