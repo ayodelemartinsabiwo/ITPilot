@@ -107,7 +107,7 @@ export default function RenewalsPage() {
               </div>
             </div>
             <Button
-              variant={autoRenewEnabled ? 'outline' : 'default'}
+              variant={autoRenewEnabled ? 'outline' : 'primary'}
               className={!autoRenewEnabled ? 'bg-orange-500 hover:bg-orange-600' : ''}
               onClick={() => setAutoRenewEnabled(!autoRenewEnabled)}
             >
