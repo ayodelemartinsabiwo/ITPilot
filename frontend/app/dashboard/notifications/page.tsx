@@ -151,7 +151,7 @@ export default function NotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" variant="primary">
+            <Button variant="primary" size="sm">
               All
             </Button>
             <Button variant="outline" size="sm">
