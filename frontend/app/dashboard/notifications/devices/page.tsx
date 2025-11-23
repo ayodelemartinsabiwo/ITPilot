@@ -154,7 +154,7 @@ export default function DeviceNotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="default" size="sm" className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" size="sm" className="bg-orange-500 hover:bg-orange-600">
               All Warnings
             </Button>
             <Button variant="outline" size="sm">
