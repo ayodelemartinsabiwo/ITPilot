@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { SidebarNew } from '@/components/layout/Sidebar-New'
 import { Navbar } from '@/components/layout/Navbar'
 import { useAuthStore } from '@/lib/store'
 import { authService } from '@/lib/api/services/auth.service'
@@ -56,7 +56,7 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="flex pt-16 overflow-x-hidden">
-        <Sidebar />
+        <SidebarNew />
         <main className="flex-1 overflow-x-hidden overflow-y-auto min-w-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
             {children}

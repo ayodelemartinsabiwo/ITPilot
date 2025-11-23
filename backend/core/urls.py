@@ -32,6 +32,11 @@ urlpatterns = [
     path('api/v1/remote-access/', include('remote_access.urls')),
     path('api/v1/billing/', include('billing.urls')),
     path('api/v1/notifications/', include('notifications.urls')),
+
+    # New Dashboard Sections
+    path('api/v1/ai-diagnostics/', include('ai_diagnostics.urls')),
+    path('api/v1/network-security/', include('network_security.urls')),
+    path('api/v1/admin/', include('admin_controls.urls')),
 ]
 
 # Serve media files in development
