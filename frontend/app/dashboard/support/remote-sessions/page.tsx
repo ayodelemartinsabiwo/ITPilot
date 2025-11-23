@@ -58,7 +58,7 @@ export default function RemoteSessionsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Remote Sessions</h1>
           <p className="text-gray-600 mt-1">Manage and monitor remote support sessions</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <PlayCircle className="w-4 h-4 mr-2" />
           Start New Session
         </Button>
@@ -188,7 +188,7 @@ export default function RemoteSessionsPage() {
               <Monitor className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No remote sessions yet</p>
               <p className="text-sm mt-2">Start your first remote session to provide hands-on support</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <PlayCircle className="w-4 h-4 mr-2" />
                 Start Your First Session
               </Button>

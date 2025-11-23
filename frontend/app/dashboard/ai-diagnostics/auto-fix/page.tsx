@@ -75,7 +75,7 @@ export default function AutoFixPage() {
             <History className="w-4 h-4 mr-2" />
             View History
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Configure Auto-Fix
           </Button>
@@ -206,7 +206,7 @@ export default function AutoFixPage() {
               <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No auto-fix actions available</p>
               <p className="text-sm mt-2">Run a diagnostic scan to identify issues that can be automatically fixed</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <AlertTriangle className="w-4 h-4 mr-2" />
                 Run Diagnostic Scan
               </Button>

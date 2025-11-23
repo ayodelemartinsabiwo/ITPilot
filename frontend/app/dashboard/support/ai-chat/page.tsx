@@ -50,7 +50,7 @@ export default function AIChatSupportPage() {
           <h1 className="text-3xl font-bold text-gray-900">AI Chat Support</h1>
           <p className="text-gray-600 mt-1">Get instant help from our AI-powered support assistant</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Sparkles className="w-4 h-4 mr-2" />
           New Conversation
         </Button>
@@ -192,7 +192,7 @@ export default function AIChatSupportPage() {
                 />
                 <Button
                   onClick={sendMessage}
-                  className="bg-orange-500 hover:bg-orange-600"
+                  variant="primary"
                   disabled={!inputMessage.trim()}
                 >
                   <Send className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function AIChatSupportPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-4">
-              <Button className="w-full bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="w-full">
                 <User className="w-4 h-4 mr-2" />
                 Talk to Human Agent
               </Button>

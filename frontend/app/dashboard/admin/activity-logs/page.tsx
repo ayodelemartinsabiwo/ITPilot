@@ -63,7 +63,7 @@ export default function ActivityLogsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Activity Logs</h1>
           <p className="text-gray-600 mt-1">Track user actions and system events</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Download className="w-4 h-4 mr-2" />
           Export Logs
         </Button>

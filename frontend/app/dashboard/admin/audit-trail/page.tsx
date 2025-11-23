@@ -81,7 +81,7 @@ export default function AuditTrailPage() {
             <Filter className="w-4 h-4 mr-2" />
             Advanced Filter
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Download className="w-4 h-4 mr-2" />
             Export Audit
           </Button>

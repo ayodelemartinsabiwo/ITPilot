@@ -147,7 +147,7 @@ export default function TechnicianQueuePage() {
               </div>
               <Button
                 onClick={() => setIsQueueActive(true)}
-                className="bg-orange-500 hover:bg-orange-600"
+                variant="primary"
               >
                 <Play className="w-4 h-4 mr-2" />
                 Resume Queue
@@ -213,7 +213,7 @@ export default function TechnicianQueuePage() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                    <Button size="sm" variant="primary">
                       <ArrowRight className="w-4 h-4 mr-2" />
                       Assign
                     </Button>

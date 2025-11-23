@@ -83,7 +83,7 @@ export default function AIDiagnosticsPage() {
           <h1 className="text-3xl font-bold text-gray-900">AI Diagnostics</h1>
           <p className="text-gray-600 mt-1">Automated system diagnostics and issue detection</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <span className="mr-2">⚡</span>
           Run Full Scan
         </Button>

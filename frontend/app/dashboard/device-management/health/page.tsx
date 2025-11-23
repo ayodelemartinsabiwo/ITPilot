@@ -14,7 +14,7 @@ export default function DeviceHealthPage() {
           <h1 className="text-3xl font-bold text-gray-900">Device Health</h1>
           <p className="text-gray-600 mt-1">Monitor the health status of all devices</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Activity className="w-4 h-4 mr-2" />
           Run Health Check
         </Button>

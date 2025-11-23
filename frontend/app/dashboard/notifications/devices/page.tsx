@@ -37,7 +37,7 @@ export default function DeviceNotificationsPage() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
@@ -154,7 +154,7 @@ export default function DeviceNotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" size="sm">
               All Warnings
             </Button>
             <Button variant="outline" size="sm">
@@ -268,7 +268,7 @@ export default function DeviceNotificationsPage() {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3">
-                      <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                      <Button size="sm" variant="primary">
                         View Device
                       </Button>
                       <Button size="sm" variant="outline">

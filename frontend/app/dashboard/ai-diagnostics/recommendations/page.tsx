@@ -58,7 +58,7 @@ export default function RecommendationsPage() {
           <h1 className="text-3xl font-bold text-gray-900">AI Recommendations</h1>
           <p className="text-gray-600 mt-1">Intelligent suggestions to optimize your IT infrastructure</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Lightbulb className="w-4 h-4 mr-2" />
           Generate New Recommendations
         </Button>
@@ -189,7 +189,7 @@ export default function RecommendationsPage() {
               <Lightbulb className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No recommendations yet</p>
               <p className="text-sm mt-2">Run a diagnostic scan to receive AI-powered recommendations</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <Lightbulb className="w-4 h-4 mr-2" />
                 Generate Recommendations
               </Button>

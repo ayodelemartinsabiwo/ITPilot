@@ -44,7 +44,7 @@ export default function RealTimeScanPage() {
               Pause Scan
             </Button>
           ) : (
-            <Button onClick={startScan} className="bg-orange-500 hover:bg-orange-600">
+            <Button onClick={startScan} variant="primary">
               <Play className="w-4 h-4 mr-2" />
               Start New Scan
             </Button>
@@ -208,7 +208,7 @@ export default function RealTimeScanPage() {
               <Activity className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No scans performed yet</p>
               <p className="text-sm mt-2">Start your first diagnostic scan to see results here</p>
-              <Button onClick={startScan} className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button onClick={startScan} variant="primary" className="mt-4">
                 <Play className="w-4 h-4 mr-2" />
                 Start Your First Scan
               </Button>

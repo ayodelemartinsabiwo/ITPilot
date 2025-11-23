@@ -39,7 +39,7 @@ export default function RolesPermissionsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Roles & Permissions</h1>
           <p className="text-gray-600 mt-1">Configure access control and user permissions</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Plus className="w-4 h-4 mr-2" />
           Create Role
         </Button>
@@ -153,7 +153,7 @@ export default function RolesPermissionsPage() {
               <Shield className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No custom roles yet</p>
               <p className="text-sm mt-2">Create your first role to manage permissions</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Role
               </Button>

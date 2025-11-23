@@ -14,7 +14,7 @@ export default function ComplianceCheckPage() {
           <h1 className="text-3xl font-bold text-gray-900">Compliance Check</h1>
           <p className="text-gray-600 mt-1">Ensure devices meet compliance standards</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <FileCheck className="w-4 h-4 mr-2" />
           Run Compliance Audit
         </Button>

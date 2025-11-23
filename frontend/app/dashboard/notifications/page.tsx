@@ -34,7 +34,7 @@ export default function NotificationsPage() {
             <CheckCheck className="w-4 h-4 mr-2" />
             Mark All Read
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Settings
           </Button>
@@ -151,7 +151,7 @@ export default function NotificationsPage() {
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" size="sm">
               All
             </Button>
             <Button variant="outline" size="sm">

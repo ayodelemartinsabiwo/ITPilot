@@ -40,7 +40,7 @@ export default function OrganizationSettingsPage() {
           <p className="text-gray-600 mt-1">Manage your organization preferences and configuration</p>
         </div>
         <Button
-          className="bg-orange-500 hover:bg-orange-600"
+          variant="primary"
           onClick={handleSave}
           isLoading={isSaving}
         >

@@ -14,7 +14,7 @@ export default function LicensesPage() {
           <h1 className="text-3xl font-bold text-gray-900">License Usage Monitoring</h1>
           <p className="text-gray-600 mt-1">Track and optimize your cloud service licenses</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Key className="w-4 h-4 mr-2" />
           Add License
         </Button>
@@ -183,7 +183,7 @@ export default function LicensesPage() {
             <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No recommendations yet</p>
             <p className="text-sm mt-2">We'll analyze your license usage and suggest optimizations</p>
-            <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" className="mt-4">
               <Key className="w-4 h-4 mr-2" />
               Add Your First License
             </Button>

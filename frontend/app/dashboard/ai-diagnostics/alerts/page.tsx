@@ -90,7 +90,7 @@ export default function AlertsPage() {
               </>
             )}
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Alert Settings
           </Button>
@@ -280,7 +280,7 @@ export default function AlertsPage() {
               <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No active alerts</p>
               <p className="text-sm mt-2">All systems are operating normally</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <Settings className="w-4 h-4 mr-2" />
                 Configure Alert Rules
               </Button>

@@ -49,7 +49,7 @@ export default function ThreatsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Threat Monitoring</h1>
           <p className="text-gray-600 mt-1">Real-time security threat detection and alerts</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Shield className="w-4 h-4 mr-2" />
           Run Security Scan
         </Button>

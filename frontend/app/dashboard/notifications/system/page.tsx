@@ -33,7 +33,7 @@ export default function SystemNotificationsPage() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Configure
           </Button>
