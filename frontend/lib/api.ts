@@ -3,6 +3,41 @@ import { toast } from 'sonner'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
 
+// Redirect management - prevent infinite redirect loops
+let isRedirecting = false
+let lastRedirectTime = 0
+const REDIRECT_COOLDOWN = 3000 // 3 seconds cooldown between redirects
+
+// Safe redirect function with cooldown to prevent loops
+const safeRedirectToLogin = () => {
+  if (typeof window === 'undefined') return
+
+  const now = Date.now()
+
+  // Prevent multiple redirects within cooldown period
+  if (isRedirecting || (now - lastRedirectTime < REDIRECT_COOLDOWN)) {
+    console.log('Redirect blocked: cooldown active')
+    return
+  }
+
+  isRedirecting = true
+  lastRedirectTime = now
+
+  // Use a slight delay to batch multiple simultaneous failures
+  setTimeout(() => {
+    console.log('Redirecting to login due to auth failure')
+    window.location.href = '/login'
+  }, 100)
+}
+
+// Reset redirect flag when coming back online
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    console.log('Network: back online')
+    isRedirecting = false
+  })
+}
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -74,7 +109,7 @@ api.interceptors.response.use(
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         localStorage.removeItem('user')
-        window.location.href = '/login'
+        safeRedirectToLogin()
         return Promise.reject(refreshError)
       }
     }

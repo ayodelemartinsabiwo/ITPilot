@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Menu, X, Bell, User, LogOut, Settings, Crown, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils'
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
   const { toggleSidebar } = useUIStore()
   const [isScrolled, setIsScrolled] = useState(false)
@@ -45,14 +46,17 @@ export function Navbar() {
   const subscription = subscriptionData?.subscription
   const planName = subscription?.plan?.name || 'Free'
 
-  // Plan badge styling based on plan
-  const getPlanBadge = () => {
+  // Plan badge styling based on plan (for navbar - smaller size)
+  const getPlanBadge = (size: 'small' | 'normal' = 'normal') => {
     const plan = planName.toLowerCase()
+    const iconSize = size === 'small' ? 'w-2.5 h-2.5' : 'w-3 h-3'
+    const textSize = size === 'small' ? 'text-[10px]' : 'text-xs'
+    const padding = size === 'small' ? 'px-1.5 py-0.5' : 'px-2 py-1'
 
     if (plan === 'enterprise') {
       return (
-        <Badge variant="primary" className="gap-1 bg-gradient-to-r from-purple-600 to-purple-700 border-0 text-white">
-          <Crown className="w-3 h-3" />
+        <Badge variant="primary" className={`gap-0.5 ${padding} ${textSize} bg-gradient-to-r from-purple-600 to-purple-700 border-0 text-white`}>
+          <Crown className={iconSize} />
           Enterprise
         </Badge>
       )
@@ -60,8 +64,8 @@ export function Navbar() {
 
     if (plan === 'professional') {
       return (
-        <Badge variant="primary" className="gap-1 bg-gradient-to-r from-orange-600 to-orange-700 border-0 text-white">
-          <Sparkles className="w-3 h-3" />
+        <Badge variant="primary" className={`gap-0.5 ${padding} ${textSize} bg-gradient-to-r from-orange-600 to-orange-700 border-0 text-white`}>
+          <Sparkles className={iconSize} />
           Professional
         </Badge>
       )
@@ -69,14 +73,14 @@ export function Navbar() {
 
     if (plan === 'starter') {
       return (
-        <Badge variant="primary" className="gap-1 bg-gradient-to-r from-blue-600 to-blue-700 border-0 text-white">
+        <Badge variant="primary" className={`gap-0.5 ${padding} ${textSize} bg-gradient-to-r from-blue-600 to-blue-700 border-0 text-white`}>
           Starter
         </Badge>
       )
     }
 
     return (
-      <Badge variant="default" className="gap-1">
+      <Badge variant="default" className={`gap-0.5 ${padding} ${textSize}`}>
         Free
       </Badge>
     )
@@ -163,6 +167,7 @@ export function Navbar() {
               <>
                 {/* Notifications */}
                 <button
+                  onClick={() => router.push('/dashboard/notifications')}
                   className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   aria-label="Notifications"
                 >
@@ -180,11 +185,11 @@ export function Navbar() {
                       {(user.full_name || user.first_name || user.email).charAt(0).toUpperCase()}
                     </div>
                     <div className="hidden lg:flex flex-col items-start">
-                      <span className="text-sm font-medium text-gray-900">
-                        {user.full_name || `${user.first_name} ${user.last_name}`.trim() || user.email}
-                      </span>
-                      <div className="flex items-center gap-1 -mt-0.5">
-                        {getPlanBadge()}
+                      <div className="flex items-center gap-1.5">
+                        {getPlanBadge('small')}
+                        <span className="text-sm font-medium text-gray-900">
+                          {user.full_name || `${user.first_name} ${user.last_name}`.trim() || user.email}
+                        </span>
                       </div>
                     </div>
                   </button>
