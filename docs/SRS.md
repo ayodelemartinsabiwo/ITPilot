@@ -20,6 +20,8 @@
 9. [Security & Compliance](#9-security--compliance)
 10. [Integration Requirements](#10-integration-requirements)
 11. [Deployment & Scalability](#11-deployment--scalability)
+12. [User Experience Workflow](#12-user-experience-workflow)
+13. [Subscription Plans](#13-subscription-plans)
 
 ---
 
@@ -855,7 +857,717 @@ app/
 
 ---
 
-## 12. Subscription Plans
+## 12. User Experience Workflow
+
+### 12.1 Overview
+This section provides a detailed UX workflow diagram that maps out how a user interacts with ITPilot from sign-in to problem resolution, following a Figma-blueprint style approach.
+
+### 12.2 Structured UX Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         ITPilot UX Flow                          │
+│                    (Figma Blueprint Style)                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### **1. User Entry Flow**
+
+```
+START
+  ↓
+Login/SSO
+  ↓
+MFA Verification (if enabled)
+  ↓
+Dashboard Home (Root Node)
+  ↓
+┌─────────────────────────────────────────────┐
+│  First-Time User Flow (Onboarding)          │
+│  - Guided tour of dashboard sections        │
+│  - Connect devices prompt                   │
+│  - Connect cloud accounts prompt            │
+│  - Set notification preferences             │
+└─────────────────────────────────────────────┘
+```
+
+**User Types:**
+- **End User**: Access to personal devices and limited features
+- **Technician**: Access to support queue and remote sessions
+- **Admin**: Full access to all dashboard sections
+- **Organization Owner**: Complete system control
+
+---
+
+#### **2. Device Management Workflow**
+
+```
+Dashboard Home
+  ↓
+Device Management Section
+  ├──→ Connected Devices
+  │      ↓
+  │    View Device List
+  │      ↓
+  │    Select Device → Device Details
+  │      ↓
+  │    Health Scan (manual/scheduled)
+  │      ↓
+  │    ┌─────────────┐
+  │    │ Issue Found?│
+  │    └─────────────┘
+  │      ↓           ↓
+  │    YES          NO
+  │      ↓           ↓
+  │    Auto-Fix   Display
+  │    Available?  Healthy
+  │      ↓           Status
+  │    YES  NO
+  │      ↓   ↓
+  │    Apply Escalate
+  │    Fix   to AI
+  │           Diagnostics
+  │           ↓
+  │         Create
+  │         Ticket
+  │
+  ├──→ Performance Metrics
+  │      ↓
+  │    CPU/RAM/Storage Charts
+  │      ↓
+  │    Identify Bottleneck
+  │      ↓
+  │    Optimization Tools
+  │      ↓
+  │    Apply Fix
+  │
+  └──→ Security Status
+         ↓
+       Threat Detection
+         ↓
+       Patch Status
+         ↓
+       Apply Update
+```
+
+**Interrelations:**
+- Sends diagnostics → **AI Diagnostics**
+- Generates alerts → **Notifications Center**
+- Severe issues → **Support & Escalation**
+- Compliance checks → **Cloud Integrations** (Intune)
+
+---
+
+#### **3. Cloud & Account Integrations Workflow**
+
+```
+Dashboard Home
+  ↓
+Cloud Integrations Section
+  ↓
+Select Provider
+  ├──→ Microsoft 365
+  │      ↓
+  │    OAuth Authorization
+  │      ↓
+  │    Sync Data (Users, Devices, Licenses)
+  │      ↓
+  │    Service Health Overview
+  │      ↓
+  │    ┌──────────────┐
+  │    │ Sync Error?  │
+  │    └──────────────┘
+  │      ↓           ↓
+  │    YES          NO
+  │      ↓           ↓
+  │    Log to      Display
+  │    Sync        Status
+  │    Errors
+  │      ↓
+  │    Notify User
+  │      ↓
+  │    Retry Sync
+  │
+  ├──→ Google Workspace
+  │      (Similar flow)
+  │
+  └──→ License Usage
+         ↓
+       View Active/Inactive Licenses
+         ↓
+       Optimize License Allocation
+         ↓
+       Save Changes
+         ↓
+       Update Billing
+```
+
+**Interrelations:**
+- Sync errors → **AI Diagnostics**
+- License issues → **Notifications Center**
+- Admin settings → **Admin & Controls**
+- Compliance data → **Device Management**
+
+---
+
+#### **4. AI Diagnostics Workflow**
+
+```
+Dashboard Home
+  ↓
+AI Diagnostics Section
+  ↓
+┌─────────────────┐
+│ Trigger Source  │
+├─────────────────┤
+│ - Manual Scan   │
+│ - Scheduled     │
+│ - Device Alert  │
+│ - Cloud Alert   │
+└─────────────────┘
+  ↓
+Real-Time Scan
+  ├──→ Device Scan
+  ├──→ Network Scan
+  └──→ Cloud Account Scan
+  ↓
+Issue Detection
+  ↓
+┌────────────────────┐
+│ Classify Severity  │
+├────────────────────┤
+│ - Low              │
+│ - Medium           │
+│ - High             │
+│ - Critical         │
+└────────────────────┘
+  ↓
+AI Explanation
+  ↓
+Recommended Actions
+  ↓
+┌─────────────────┐
+│ Auto-Fix Ready? │
+└─────────────────┘
+  ↓           ↓
+YES          NO
+  ↓           ↓
+Execute    Display
+Auto-Fix   Manual
+  ↓        Steps
+Verify      ↓
+Success   User
+  ↓       Executes
+┌──────┐    ↓
+│Fixed?│  ┌──────┐
+└──────┘  │Fixed?│
+  ↓       └──────┘
+YES  NO     ↓
+  ↓   ↓   YES  NO
+ Log Escalate  ↓   ↓
+ to  to      Log Escalate
+Activity Support   to  to
+History         Activity Support
+                History
+```
+
+**Interrelations:**
+- Pulls data from: **Device Management**, **Cloud Integrations**, **Network & Security**
+- Sends instructions to: **Support & Escalation**
+- Alerts appear in: **Notifications Center**
+- Logs stored in: **Admin & Controls** (Activity Logs)
+
+---
+
+#### **5. Network & Security Workflow**
+
+```
+Dashboard Home
+  ↓
+Network & Security Section
+  ↓
+Network Scan
+  ├──→ Wi-Fi Quality Report
+  │      ↓
+  │    Check Signal Strength
+  │    Check Speed
+  │    Check Latency
+  │    Check Interference
+  │      ↓
+  │    Generate Recommendations
+  │      ↓
+  │    User Applies Fix
+  │
+  ├──→ Threat Alerts
+  │      ↓
+  │    Detect Malware
+  │    Detect Unauthorized Access
+  │    Detect Risky Apps
+  │      ↓
+  │    ┌──────────────┐
+  │    │ Threat Level │
+  │    └──────────────┘
+  │      ↓
+  │    Critical → Immediate Alert
+  │    High     → Escalate to Support
+  │    Medium   → User Action Required
+  │    Low      → Log & Monitor
+  │      ↓
+  │    Mitigation Steps
+  │      ↓
+  │    Execute/Schedule Fix
+  │
+  └──→ Patch Status
+         ↓
+       Scan for Updates
+         ↓
+       ┌─────────────────┐
+       │ Updates Found?  │
+       └─────────────────┘
+         ↓           ↓
+       YES          NO
+         ↓           ↓
+       Show        Display
+       Pending     Up-to-date
+       Updates     Status
+         ↓
+       Install Patch
+         ↓
+       Verify Installation
+```
+
+**Interrelations:**
+- Security risks → **AI Diagnostics**
+- Critical threats → **Support & Escalation**
+- Logs → **Admin & Controls**
+- Alerts → **Notifications Center**
+
+---
+
+#### **6. Support & Escalation Workflow**
+
+```
+Dashboard Home
+  ↓
+Support & Escalation Section
+  ↓
+┌──────────────────┐
+│ Entry Point      │
+├──────────────────┤
+│ - AI Chat        │
+│ - Manual Ticket  │
+│ - Auto-escalated │
+│ - User Request   │
+└──────────────────┘
+  ↓
+AI Chat Support
+  ↓
+User Describes Issue
+  ↓
+AI Analyzes Context
+  ├──→ Pulls Device Data
+  ├──→ Pulls Cloud Data
+  ├──→ Pulls Diagnostic History
+  └──→ Pulls Similar Tickets
+  ↓
+Issue Classification
+  ↓
+┌─────────────────┐
+│ Can AI Resolve? │
+└─────────────────┘
+  ↓           ↓
+YES          NO
+  ↓           ↓
+Suggest    Create
+Fix        Ticket
+  ↓           ↓
+User       Assign
+Executes   Priority
+  ↓           ↓
+┌──────┐  Route to
+│Fixed?│  Technician
+└──────┘  Queue
+  ↓         ↓
+YES  NO   Technician
+  ↓   ↓   Reviews
+Close Create  ↓
+Chat  Ticket ┌────────────────┐
+            │ Resolution     │
+            │ Method?        │
+            └────────────────┘
+              ↓          ↓
+            Remote    Guide
+            Session   User
+              ↓          ↓
+            User      Follow
+            Approves  Steps
+              ↓          ↓
+            Session   ┌──────┐
+            Begins    │Fixed?│
+              ↓       └──────┘
+            Technician  ↓
+            Actions   YES  NO
+              ↓        ↓   ↓
+            ┌──────┐ Close Request
+            │Fixed?│ Ticket Remote
+            └──────┘      Session
+              ↓
+            YES  NO
+              ↓   ↓
+            Close Further
+            Ticket Investigation
+              ↓
+            Session
+            History
+```
+
+**Interrelations:**
+- Pulls data from: **AI Diagnostics**, **Device Management**, **Cloud Integrations**
+- Updates: **Notifications Center**
+- Logs: **Admin & Controls** (Audit Trail)
+- Session recordings: **Admin & Controls**
+
+---
+
+#### **7. Admin & Controls Workflow**
+
+```
+Dashboard Home
+  ↓
+Admin & Controls Section
+  ↓
+┌──────────────────────┐
+│ Admin Actions        │
+├──────────────────────┤
+│ - User Management    │
+│ - Roles & Permissions│
+│ - Activity Logs      │
+│ - Audit Trail        │
+│ - Org Settings       │
+└──────────────────────┘
+  ↓
+User Management
+  ├──→ Add User
+  │      ↓
+  │    Send Invitation
+  │      ↓
+  │    User Accepts
+  │      ↓
+  │    Assign Role
+  │      ↓
+  │    Grant Permissions
+  │
+  ├──→ Roles & Permissions
+  │      ↓
+  │    Create Custom Role
+  │      ↓
+  │    Define Access Levels
+  │      ├──→ Device Management Access
+  │      ├──→ Cloud Integration Access
+  │      ├──→ Support Access
+  │      ├──→ Remote Session Access
+  │      ├──→ Billing Access
+  │      └──→ Admin Access
+  │      ↓
+  │    Apply to Users
+  │
+  ├──→ Activity Logs
+  │      ↓
+  │    View All Actions
+  │      ├──→ User Login/Logout
+  │      ├──→ Device Changes
+  │      ├──→ Ticket Actions
+  │      ├──→ Remote Sessions
+  │      └──→ Settings Changes
+  │      ↓
+  │    Filter & Search
+  │      ↓
+  │    Export Logs
+  │
+  └──→ Audit Trail
+         ↓
+       View Compliance Records
+         ├──→ Remote Session Logs (730 days)
+         ├──→ Data Access Logs
+         ├──→ Security Events
+         └──→ Configuration Changes
+         ↓
+       Generate Audit Report
+         ↓
+       Export (PDF/CSV)
+```
+
+**Interrelations:**
+- Defines access for: **All Modules**
+- Tracks activities from: **All Modules**
+- Audit logs track: **AI Diagnostics**, **Support**, **Network**, **Billing**
+
+---
+
+#### **8. Billing & Subscriptions Workflow**
+
+```
+Dashboard Home
+  ↓
+Billing & Subscriptions Section
+  ↓
+Plans & Usage
+  ├──→ View Current Plan
+  │      ↓
+  │    Check Usage Limits
+  │      ├──→ Devices (X/Y)
+  │      ├──→ Users (X/Y)
+  │      ├──→ Storage (X GB/Y GB)
+  │      └──→ API Calls
+  │      ↓
+  │    ┌──────────────┐
+  │    │ Limit Reached?│
+  │    └──────────────┘
+  │      ↓           ↓
+  │    YES          NO
+  │      ↓           ↓
+  │    Upgrade    Continue
+  │    Plan       Normal
+  │      ↓        Operation
+  │    Select
+  │    New Plan
+  │      ↓
+  │    Review
+  │    Features
+  │      ↓
+  │    Confirm
+  │    Upgrade
+  │
+  ├──→ Payment History
+  │      ↓
+  │    View Invoices
+  │      ↓
+  │    Download Receipt
+  │
+  └──→ Renewal Alerts
+         ↓
+       ┌─────────────────┐
+       │ Days to Renewal │
+       └─────────────────┘
+         ↓
+       30 days → Email reminder
+       15 days → Email + In-app
+       7 days  → Email + In-app + SMS
+       1 day   → All channels
+         ↓
+       Auto-Renew Settings
+         ↓
+       Enabled → Auto-charge
+       Disabled → Manual renewal
+```
+
+**Interrelations:**
+- Limits access to: **Device Management**, **Cloud Integrations** (based on plan)
+- Sends alerts to: **Notifications Center**
+- Tracks usage from: **All Modules**
+
+---
+
+#### **9. Notifications Center Workflow**
+
+```
+Dashboard Home
+  ↓
+Notifications Center
+  ↓
+┌─────────────────────────┐
+│ Notification Sources    │
+├─────────────────────────┤
+│ - Device Alerts         │
+│ - Security Warnings     │
+│ - License Reminders     │
+│ - Ticket Updates        │
+│ - System Messages       │
+│ - Cloud Sync Status     │
+│ - Billing Alerts        │
+└─────────────────────────┘
+  ↓
+All Notifications View
+  ↓
+Filter by Type
+  ├──→ System Messages
+  │      ↓
+  │    View Message
+  │      ↓
+  │    Mark as Read
+  │      ↓
+  │    ┌────────────┐
+  │    │ Action     │
+  │    │ Required?  │
+  │    └────────────┘
+  │      ↓       ↓
+  │    YES      NO
+  │      ↓       ↓
+  │    Jump to Archive
+  │    Module
+  │
+  ├──→ Security Alerts
+  │      ↓
+  │    View Alert Details
+  │      ↓
+  │    Jump to AI Diagnostics
+  │      ↓
+  │    or
+  │      ↓
+  │    Jump to Network & Security
+  │
+  ├──→ License Reminders
+  │      ↓
+  │    View Expiring Licenses
+  │      ↓
+  │    Jump to Cloud Integrations
+  │      ↓
+  │    or
+  │      ↓
+  │    Jump to Billing
+  │
+  └──→ Device Warnings
+         ↓
+       View Device Issue
+         ↓
+       Jump to Device Management
+         ↓
+       or
+         ↓
+       Jump to AI Diagnostics
+```
+
+**Interrelations:**
+- Acts as central link between: **All Modules**
+- All alerting systems push to: **Notifications Center**
+- Deep links to: **All relevant module sections**
+
+---
+
+### 12.3 Cross-Module Integration Map
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   ITPilot Integration Map                        │
+└─────────────────────────────────────────────────────────────────┘
+
+Device Management
+  ├─→ AI Diagnostics (health data)
+  ├─→ Notifications (alerts)
+  ├─→ Support (escalation)
+  └─→ Cloud Integrations (compliance)
+
+Cloud Integrations
+  ├─→ AI Diagnostics (sync issues)
+  ├─→ Notifications (license alerts)
+  ├─→ Admin & Controls (role sync)
+  └─→ Device Management (compliance data)
+
+AI Diagnostics
+  ├─→ All Modules (data collection)
+  ├─→ Support (ticket creation)
+  ├─→ Notifications (alert distribution)
+  └─→ Admin & Controls (activity logs)
+
+Network & Security
+  ├─→ AI Diagnostics (threat analysis)
+  ├─→ Support (critical escalation)
+  ├─→ Admin & Controls (security logs)
+  └─→ Notifications (security alerts)
+
+Support & Escalation
+  ├─→ All Modules (context gathering)
+  ├─→ Notifications (ticket updates)
+  └─→ Admin & Controls (session logs)
+
+Admin & Controls
+  ├─→ All Modules (access control)
+  ├─→ All Modules (activity tracking)
+  └─→ All Modules (audit logging)
+
+Billing
+  ├─→ All Modules (feature gating)
+  └─→ Notifications (renewal alerts)
+
+Notifications
+  ├─→ All Modules (alert aggregation)
+  └─→ All Modules (deep linking)
+```
+
+---
+
+### 12.4 User Journey Examples
+
+#### Journey 1: New User Onboarding
+1. **Sign Up** → Email verification
+2. **Dashboard Home** → Onboarding tour
+3. **Device Management** → Install agent on first device
+4. **Cloud Integrations** → Connect Microsoft 365
+5. **Notifications** → Configure alert preferences
+6. **Dashboard Home** → View unified dashboard
+
+#### Journey 2: Issue Detection & Resolution
+1. **Device** → Health degradation detected
+2. **Notifications** → Alert sent to user
+3. **AI Diagnostics** → Automatic scan triggered
+4. **AI Diagnostics** → Issue identified, fix suggested
+5. **Device Management** → Auto-fix applied
+6. **Notifications** → Resolution confirmed
+
+#### Journey 3: Escalation to Technician
+1. **AI Chat** → User describes complex issue
+2. **AI Diagnostics** → Unable to auto-resolve
+3. **Support** → Ticket created automatically
+4. **Technician Queue** → Assigned to technician
+5. **Remote Session** → User approves access
+6. **Support** → Issue resolved, ticket closed
+7. **Admin & Controls** → Session logged for audit
+
+#### Journey 4: Admin Configuration
+1. **Admin & Controls** → Add new team member
+2. **Admin & Controls** → Assign role (Technician)
+3. **Admin & Controls** → Set permissions
+4. **Notifications** → Invitation sent
+5. **New User** → Accepts invitation
+6. **Admin & Controls** → Activity logged
+
+---
+
+### 12.5 Notification Flow Examples
+
+```
+Device Health Alert Flow:
+Device → AI Diagnostics → Notifications → User
+                ↓
+         Activity Log (Admin)
+
+Security Threat Flow:
+Network Security → AI Diagnostics → Notifications → User
+                                          ↓
+                                    Support (if critical)
+                                          ↓
+                                    Audit Trail (Admin)
+
+License Expiry Flow:
+Cloud Integrations → Billing → Notifications → User
+                                      ↓
+                                30/15/7/1 day reminders
+
+Remote Session Request Flow:
+Technician → Support → Notifications → User
+                            ↓
+                      User Approves
+                            ↓
+                      Session Begins
+                            ↓
+                      Audit Trail (Admin)
+```
+
+---
+
+## 13. Subscription Plans
 
 | Plan | Target | Price (NGN/mo) | Features |
 |------|--------|----------------|----------|
@@ -874,6 +1586,7 @@ app/
 |---------|------|--------|---------|
 | 1.0 | 2025-01-15 | ITPilot Team | Initial SRS document |
 | 2.0 | 2025-11-22 | ITPilot Team | Added Product Purpose, Implementation Strategy, Dashboard Structure |
+| 2.1 | 2025-11-22 | ITPilot Team | Added comprehensive UX Workflow Diagram (Section 12) |
 
 **Approval:**
 
