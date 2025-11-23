@@ -9,6 +9,14 @@ import { API_CONFIG } from './config'
 const TOKEN_KEY = 'access_token'
 const REFRESH_TOKEN_KEY = 'refresh_token'
 
+// Redirect management - prevent infinite redirect loops
+let isRedirecting = false
+let lastRedirectTime = 0
+const REDIRECT_COOLDOWN = 3000 // 3 seconds cooldown between redirects
+
+// Network status tracking
+let isOnline = typeof window !== 'undefined' ? window.navigator.onLine : true
+
 export const getAccessToken = () => {
   if (typeof window === 'undefined') return null
   return localStorage.getItem(TOKEN_KEY)
@@ -31,12 +39,49 @@ export const clearTokens = () => {
   localStorage.removeItem(REFRESH_TOKEN_KEY)
 }
 
+// Safe redirect function with cooldown to prevent loops
+const safeRedirectToLogin = () => {
+  if (typeof window === 'undefined') return
+
+  const now = Date.now()
+
+  // Prevent multiple redirects within cooldown period
+  if (isRedirecting || (now - lastRedirectTime < REDIRECT_COOLDOWN)) {
+    console.log('Redirect blocked: cooldown active')
+    return
+  }
+
+  isRedirecting = true
+  lastRedirectTime = now
+
+  // Use a slight delay to batch multiple simultaneous failures
+  setTimeout(() => {
+    console.log('Redirecting to login due to auth failure')
+    window.location.href = '/login'
+  }, 100)
+}
+
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.baseURL,
   timeout: API_CONFIG.timeout,
   headers: API_CONFIG.headers,
 })
+
+// Setup online/offline listeners
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    console.log('Network: back online')
+    isOnline = true
+    // Reset redirect flag when coming back online
+    isRedirecting = false
+  })
+
+  window.addEventListener('offline', () => {
+    console.log('Network: offline')
+    isOnline = false
+  })
+}
 
 // Request interceptor - Add auth token
 apiClient.interceptors.request.use(
@@ -93,9 +138,7 @@ apiClient.interceptors.response.use(
 
       if (!refreshToken) {
         clearTokens()
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
-        }
+        safeRedirectToLogin()
         return Promise.reject(error)
       }
 
@@ -118,11 +161,7 @@ apiClient.interceptors.response.use(
         processQueue(refreshError, null)
         isRefreshing = false
         clearTokens()
-
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login'
-        }
-
+        safeRedirectToLogin()
         return Promise.reject(refreshError)
       }
     }
