@@ -50,7 +50,7 @@ export default function SupportTicketsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Support Tickets</h1>
           <p className="text-gray-600 mt-1">Manage and track all support requests</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Plus className="w-4 h-4 mr-2" />
           Create Ticket
         </Button>
@@ -168,7 +168,7 @@ export default function SupportTicketsPage() {
               <Ticket className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No support tickets yet</p>
               <p className="text-sm mt-2">Create your first ticket to track support requests</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Ticket
               </Button>

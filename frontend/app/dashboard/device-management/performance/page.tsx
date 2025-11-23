@@ -24,7 +24,7 @@ export default function PerformanceMetricsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Performance Metrics</h1>
           <p className="text-gray-600 mt-1">Monitor real-time performance across all devices</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <TrendingUp className="w-4 h-4 mr-2" />
           View Reports
         </Button>

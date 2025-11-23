@@ -14,7 +14,7 @@ export default function Microsoft365Page() {
           <h1 className="text-3xl font-bold text-gray-900">Microsoft 365 Integration</h1>
           <p className="text-gray-600 mt-1">Manage your Microsoft 365 services and connections</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Settings className="w-4 h-4 mr-2" />
           Configure Integration
         </Button>
@@ -164,7 +164,7 @@ export default function Microsoft365Page() {
             <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No activity yet</p>
             <p className="text-sm mt-2">Connect your Microsoft 365 account to start syncing data</p>
-            <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" className="mt-4">
               <Settings className="w-4 h-4 mr-2" />
               Configure Integration
             </Button>

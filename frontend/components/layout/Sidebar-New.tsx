@@ -61,7 +61,7 @@ const navigation: NavigationItem[] = [
     name: 'Device Management',
     icon: Laptop,
     children: [
-      { name: 'Connected Devices', href: '/dashboard/device-management/devices', icon: Server },
+      { name: 'Connected Devices', href: '/dashboard/devices', icon: Server },
       { name: 'Device Health', href: '/dashboard/device-management/health', icon: Activity },
       { name: 'Performance Metrics', href: '/dashboard/device-management/performance', icon: LayoutDashboard },
       { name: 'Security Status', href: '/dashboard/device-management/security', icon: Lock },

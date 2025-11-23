@@ -32,7 +32,7 @@ export default function WiFiAnalysisPage() {
           <h1 className="text-3xl font-bold text-gray-900">WiFi Network Analysis</h1>
           <p className="text-gray-600 mt-1">Monitor wireless network performance and connected devices</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <RefreshCw className="w-4 h-4 mr-2" />
           Scan Networks
         </Button>
@@ -130,7 +130,7 @@ export default function WiFiAnalysisPage() {
               <WifiOff className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No networks detected</p>
               <p className="text-sm mb-4">Click "Scan Networks" to discover available WiFi networks</p>
-              <Button className="bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Scan Now
               </Button>

@@ -14,7 +14,7 @@ export default function ServiceHealthPage() {
           <h1 className="text-3xl font-bold text-gray-900">Service Health Monitoring</h1>
           <p className="text-gray-600 mt-1">Monitor the status and uptime of all cloud services</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh Status
         </Button>

@@ -36,7 +36,7 @@ export default function SecurityNotificationsPage() {
             <Eye className="w-4 h-4 mr-2" />
             View All
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <Settings className="w-4 h-4 mr-2" />
             Security Settings
           </Button>
@@ -226,7 +226,7 @@ export default function SecurityNotificationsPage() {
                     </div>
                     {alert.action && (
                       <div className="mt-3">
-                        <Button size="sm" className="bg-orange-500 hover:bg-orange-600">
+                        <Button size="sm" variant="primary">
                           {alert.action}
                         </Button>
                       </div>

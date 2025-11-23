@@ -61,7 +61,7 @@ export default function PasswordsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Password Security Audit</h1>
           <p className="text-gray-600 mt-1">Analyze and strengthen password security across your organization</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <RefreshCw className="w-4 h-4 mr-2" />
           Run Audit
         </Button>
@@ -174,7 +174,7 @@ export default function PasswordsPage() {
               <Key className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No password data available</p>
               <p className="text-sm mb-4">Run a password audit to analyze account security</p>
-              <Button className="bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Start Audit
               </Button>

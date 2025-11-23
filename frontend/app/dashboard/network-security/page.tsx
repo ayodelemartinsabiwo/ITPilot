@@ -22,7 +22,7 @@ export default function NetworkSecurityPage() {
           <h1 className="text-3xl font-bold text-gray-900">Network & Security</h1>
           <p className="text-gray-600 mt-1">Monitor network performance and security threats</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <span className="mr-2">🔍</span>
           Run Security Scan
         </Button>

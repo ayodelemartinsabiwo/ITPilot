@@ -14,7 +14,7 @@ export default function ZohoPage() {
           <h1 className="text-3xl font-bold text-gray-900">Zoho & Other Cloud Services</h1>
           <p className="text-gray-600 mt-1">Manage integrations with Zoho and other cloud platforms</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Settings className="w-4 h-4 mr-2" />
           Add Integration
         </Button>
@@ -185,7 +185,7 @@ export default function ZohoPage() {
             <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No integrations configured</p>
             <p className="text-sm mt-2">Add your first cloud service integration to get started</p>
-            <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary" className="mt-4">
               <Settings className="w-4 h-4 mr-2" />
               Add Integration
             </Button>

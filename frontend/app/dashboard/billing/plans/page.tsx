@@ -68,7 +68,7 @@ export default function PlansPage() {
           <h1 className="text-3xl font-bold text-gray-900">Plans & Usage</h1>
           <p className="text-gray-600 mt-1">Manage your subscription and monitor usage</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           Upgrade Plan
         </Button>
       </div>

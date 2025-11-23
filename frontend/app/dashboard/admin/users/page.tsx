@@ -58,7 +58,7 @@ export default function UserManagementPage() {
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-1">Manage user accounts and permissions</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <UserPlus className="w-4 h-4 mr-2" />
           Add User
         </Button>
@@ -176,7 +176,7 @@ export default function UserManagementPage() {
               <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No users yet</p>
               <p className="text-sm mt-2">Add your first user to get started</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Add Your First User
               </Button>

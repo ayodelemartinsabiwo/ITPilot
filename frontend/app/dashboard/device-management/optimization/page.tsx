@@ -14,7 +14,7 @@ export default function OptimizationToolsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Optimization Tools</h1>
           <p className="text-gray-600 mt-1">Improve device performance and efficiency</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Zap className="w-4 h-4 mr-2" />
           Optimize All
         </Button>

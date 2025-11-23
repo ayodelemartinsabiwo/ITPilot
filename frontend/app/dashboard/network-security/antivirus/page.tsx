@@ -50,7 +50,7 @@ export default function AntivirusPage() {
           <h1 className="text-3xl font-bold text-gray-900">Antivirus Protection</h1>
           <p className="text-gray-600 mt-1">Monitor antivirus status across all devices</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Search className="w-4 h-4 mr-2" />
           Run Full Scan
         </Button>
@@ -132,7 +132,7 @@ export default function AntivirusPage() {
               <Shield className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No devices registered</p>
               <p className="text-sm mb-4">Add devices to monitor their antivirus protection status</p>
-              <Button className="bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary">
                 Add Device
               </Button>
             </div>
@@ -185,7 +185,7 @@ export default function AntivirusPage() {
             <FileSearch className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No scan history</p>
             <p className="text-sm mb-4">Run your first antivirus scan to see results here</p>
-            <Button className="bg-orange-500 hover:bg-orange-600">
+            <Button variant="primary">
               <Search className="w-4 h-4 mr-2" />
               Start Scan
             </Button>

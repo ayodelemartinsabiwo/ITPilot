@@ -14,7 +14,7 @@ export default function SyncErrorsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Sync Errors Tracking</h1>
           <p className="text-gray-600 mt-1">Monitor and resolve synchronization errors across cloud services</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <RefreshCw className="w-4 h-4 mr-2" />
           Retry Failed Syncs
         </Button>

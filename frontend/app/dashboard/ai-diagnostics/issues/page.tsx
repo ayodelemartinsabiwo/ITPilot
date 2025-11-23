@@ -66,7 +66,7 @@ export default function IssuesPage() {
             <Download className="w-4 h-4 mr-2" />
             Export Report
           </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600">
+          <Button variant="primary">
             <AlertTriangle className="w-4 h-4 mr-2" />
             Run New Scan
           </Button>
@@ -232,7 +232,7 @@ export default function IssuesPage() {
               <CheckCircle className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No issues detected</p>
               <p className="text-sm mt-2">Your systems are running smoothly. Great job!</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 <AlertTriangle className="w-4 h-4 mr-2" />
                 Run Diagnostic Scan
               </Button>

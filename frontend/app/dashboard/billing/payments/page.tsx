@@ -27,7 +27,7 @@ export default function PaymentsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Payment History</h1>
           <p className="text-gray-600 mt-1">View and manage your payment history</p>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600">
+        <Button variant="primary">
           <Download className="w-4 h-4 mr-2" />
           Export History
         </Button>
@@ -100,7 +100,7 @@ export default function PaymentsPage() {
               <CreditCard className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No payment methods added</p>
               <p className="text-sm mt-2">Add a payment method to start your subscription</p>
-              <Button className="mt-4 bg-orange-500 hover:bg-orange-600">
+              <Button variant="primary" className="mt-4">
                 Add Payment Method
               </Button>
             </div>
