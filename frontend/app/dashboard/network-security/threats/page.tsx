@@ -157,7 +157,7 @@ export default function ThreatsPage() {
                   <div className="flex items-center gap-4">
                     <AlertOctagon className="w-5 h-5 text-red-500" />
                     <div>
-                      <h3 className="font-semibold">{threat.name}</h3>
+                      <h3 className="font-semibold">{threat.title}</h3>
                       <p className="text-sm text-gray-600">{threat.description}</p>
                     </div>
                   </div>
