@@ -4,44 +4,49 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-
-interface DiagnosticScan {
-  id: string;
-  device_name: string;
-  scan_type: string;
-  status: string;
-  issues_found: number;
-  critical_issues: number;
-  high_issues: number;
-  medium_issues: number;
-  low_issues: number;
-  created_at: string;
-}
-
-interface DetectedIssue {
-  id: string;
-  device_name: string;
-  category: string;
-  severity: string;
-  title: string;
-  description: string;
-  status: string;
-  auto_fixable: boolean;
-}
+import { aiDiagnosticsService, DiagnosticScan, DetectedIssue, DiagnosticsStats } from '@/lib/api/services';
 
 export default function AIDiagnosticsPage() {
   const [scans, setScans] = useState<DiagnosticScan[]>([]);
   const [issues, setIssues] = useState<DetectedIssue[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DiagnosticsStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: Fetch data from API
-    // fetchScans();
-    // fetchIssues();
-    // fetchStats();
-    setLoading(false);
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch scans, issues, and stats in parallel
+      const [scansRes, issuesRes, statsRes] = await Promise.all([
+        aiDiagnosticsService.getScans({ ordering: '-created_at' }),
+        aiDiagnosticsService.getIssues({ severity: 'CRITICAL', status: 'OPEN' }),
+        aiDiagnosticsService.getStats()
+      ]);
+
+      if (scansRes.data) {
+        setScans(Array.isArray(scansRes.data) ? scansRes.data : []);
+      }
+
+      if (issuesRes.data) {
+        setIssues(Array.isArray(issuesRes.data) ? issuesRes.data : []);
+      }
+
+      if (statsRes.data) {
+        setStats(statsRes.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching diagnostics data:', err);
+      setError(err.message || 'Failed to load diagnostics data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -96,7 +101,9 @@ export default function AIDiagnosticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Scans</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : stats?.total_scans || 0}
+                </p>
               </div>
               <div className="p-3 bg-orange-100 rounded-full">
                 <span className="text-2xl">🔍</span>
@@ -110,7 +117,9 @@ export default function AIDiagnosticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Critical Issues</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {loading ? '...' : stats?.critical_issues || 0}
+                </p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
                 <span className="text-2xl">🚨</span>
@@ -124,7 +133,9 @@ export default function AIDiagnosticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Auto-Fixable</p>
-                <p className="text-3xl font-bold text-yellow-600">0</p>
+                <p className="text-3xl font-bold text-yellow-600">
+                  {loading ? '...' : stats?.auto_fixable_issues || 0}
+                </p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-full">
                 <span className="text-2xl">🔧</span>
@@ -138,7 +149,9 @@ export default function AIDiagnosticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Resolved</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {loading ? '...' : stats?.resolved_issues || 0}
+                </p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <span className="text-2xl">✅</span>
@@ -221,7 +234,7 @@ export default function AIDiagnosticsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Critical Issues Requiring Attention</h2>
-            <Badge className="bg-red-500">0 Active</Badge>
+            <Badge className="bg-red-500">{issues.length} Active</Badge>
           </div>
         </CardHeader>
         <CardContent className="p-6">
