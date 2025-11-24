@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -14,10 +14,35 @@ import {
   CreditCard,
   Clock
 } from 'lucide-react'
+import { billingService } from '@/lib/api/services/billing.service'
 
 export default function RenewalsPage() {
-  const [renewals] = useState<any[]>([])
+  const [renewals, setRenewals] = useState<any[]>([])
   const [autoRenewEnabled, setAutoRenewEnabled] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchRenewals()
+  }, [])
+
+  const fetchRenewals = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const response = await billingService.getRenewalAlerts()
+      if (response.data) {
+        setRenewals(response.data)
+      }
+    } catch (err: any) {
+      console.error('Error fetching renewals:', err)
+      setError(err.message || 'Failed to load renewal alerts')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const dueSoon = renewals.filter(r => r.daysUntil && r.daysUntil <= 30).length
 
   return (
     <div className="space-y-6">
@@ -40,7 +65,7 @@ export default function RenewalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Next Renewal</p>
-                <p className="text-3xl font-bold text-gray-900">--</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : renewals.length > 0 ? renewals[0].renewalDate || '--' : '--'}</p>
               </div>
               <Calendar className="w-8 h-8 text-orange-500" />
             </div>
@@ -52,7 +77,7 @@ export default function RenewalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Due Soon</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : dueSoon}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-yellow-500" />
             </div>
@@ -78,7 +103,7 @@ export default function RenewalsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Renewals</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : renewals.length}</p>
               </div>
               <CheckCircle2 className="w-8 h-8 text-blue-500" />
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -14,22 +14,42 @@ import {
   Lock,
   Unlock,
   Check,
-  X
+  X,
+  XCircle
 } from 'lucide-react';
-
-interface Role {
-  id: string;
-  name: string;
-  description: string;
-  userCount: number;
-  permissions: string[];
-  isSystem: boolean;
-  createdAt: string;
-}
+import { adminService, Role } from '@/lib/api/services/admin.service';
 
 export default function RolesPermissionsPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await adminService.getRoles();
+      if (response.data) {
+        setRoles(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching roles:', err);
+      setError(err.message || 'Failed to load roles');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Calculate stats from roles data
+  const totalRoles = roles.length;
+  const customRoles = roles.filter(role => role.is_custom).length;
+  const systemRoles = roles.filter(role => !role.is_custom).length;
+  const totalPermissions = roles.reduce((acc, role) => acc + role.permissions.length, 0);
 
   return (
     <div className="space-y-6">
@@ -52,7 +72,7 @@ export default function RolesPermissionsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Roles</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : totalRoles}</p>
               </div>
               <Shield className="w-8 h-8 text-blue-500" />
             </div>
@@ -64,7 +84,7 @@ export default function RolesPermissionsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Custom Roles</p>
-                <p className="text-3xl font-bold text-orange-600">0</p>
+                <p className="text-3xl font-bold text-orange-600">{isLoading ? '...' : customRoles}</p>
               </div>
               <Edit className="w-8 h-8 text-orange-500" />
             </div>
@@ -76,7 +96,7 @@ export default function RolesPermissionsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">System Roles</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{isLoading ? '...' : systemRoles}</p>
               </div>
               <Lock className="w-8 h-8 text-green-500" />
             </div>
@@ -88,7 +108,7 @@ export default function RolesPermissionsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Permissions</p>
-                <p className="text-3xl font-bold text-purple-600">0</p>
+                <p className="text-3xl font-bold text-purple-600">{isLoading ? '...' : totalPermissions}</p>
               </div>
               <Unlock className="w-8 h-8 text-purple-500" />
             </div>
@@ -148,10 +168,24 @@ export default function RolesPermissionsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          {roles.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p>Loading roles...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 text-red-500">
+              <XCircle className="w-16 h-16 mx-auto mb-4" />
+              <p className="text-lg font-medium">Error loading roles</p>
+              <p className="text-sm mt-2">{error}</p>
+              <Button variant="primary" className="mt-4" onClick={fetchRoles}>
+                Try Again
+              </Button>
+            </div>
+          ) : roles.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Shield className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-lg font-medium">No custom roles yet</p>
+              <p className="text-lg font-medium">No roles yet</p>
               <p className="text-sm mt-2">Create your first role to manage permissions</p>
               <Button variant="primary" className="mt-4">
                 <Plus className="w-4 h-4 mr-2" />
@@ -171,14 +205,14 @@ export default function RolesPermissionsPage() {
                         <div>
                           <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                             {role.name}
-                            {role.isSystem && (
+                            {!role.is_custom && (
                               <Badge variant="default" size="sm">System</Badge>
                             )}
                           </h3>
                           <p className="text-sm text-gray-600">{role.description}</p>
                         </div>
                       </div>
-                      {!role.isSystem && (
+                      {role.is_custom && (
                         <div className="flex gap-2">
                           <Button size="sm" variant="ghost">
                             <Edit className="w-4 h-4" />
@@ -190,12 +224,11 @@ export default function RolesPermissionsPage() {
                       )}
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="flex items-center text-gray-600">
-                        <Users className="w-4 h-4 mr-1" />
-                        {role.userCount} users
-                      </span>
                       <span className="text-gray-600">
                         {role.permissions.length} permissions
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(role.created_at).toLocaleDateString()}
                       </span>
                     </div>
                   </CardContent>

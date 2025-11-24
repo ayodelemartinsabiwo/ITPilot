@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -14,51 +14,38 @@ import {
   CheckCircle2,
   XCircle
 } from 'lucide-react'
+import { billingService, SubscriptionPlan, Subscription, Usage } from '@/lib/api/services/billing.service'
 
 export default function PlansPage() {
-  const [currentPlan] = useState<any>(null)
+  const [currentPlan, setCurrentPlan] = useState<Subscription | null>(null)
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([])
+  const [usage, setUsage] = useState<Usage | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const plans = [
-    {
-      name: 'Starter',
-      price: 29,
-      period: 'month',
-      features: [
-        { name: 'Up to 10 devices', included: true },
-        { name: 'Basic support', included: true },
-        { name: '5GB storage', included: true },
-        { name: 'Advanced analytics', included: false },
-        { name: 'Priority support', included: false },
-      ],
-      recommended: false,
-    },
-    {
-      name: 'Professional',
-      price: 99,
-      period: 'month',
-      features: [
-        { name: 'Up to 50 devices', included: true },
-        { name: 'Priority support', included: true },
-        { name: '50GB storage', included: true },
-        { name: 'Advanced analytics', included: true },
-        { name: 'Custom integrations', included: false },
-      ],
-      recommended: true,
-    },
-    {
-      name: 'Enterprise',
-      price: 299,
-      period: 'month',
-      features: [
-        { name: 'Unlimited devices', included: true },
-        { name: '24/7 support', included: true },
-        { name: 'Unlimited storage', included: true },
-        { name: 'Advanced analytics', included: true },
-        { name: 'Custom integrations', included: true },
-      ],
-      recommended: false,
-    },
-  ]
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const [plansRes, subscriptionRes, usageRes] = await Promise.all([
+        billingService.getPlans(),
+        billingService.getCurrentSubscription().catch(() => ({ data: null })),
+        billingService.getUsage().catch(() => ({ data: null }))
+      ])
+      if (plansRes.data) setPlans(plansRes.data)
+      if (subscriptionRes.data) setCurrentPlan(subscriptionRes.data)
+      if (usageRes.data) setUsage(usageRes.data)
+    } catch (err: any) {
+      console.error('Error fetching plans data:', err)
+      setError(err.message || 'Failed to load plans data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -80,13 +67,15 @@ export default function PlansPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Devices Used</p>
-                <p className="text-3xl font-bold text-gray-900">0 / 10</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoading ? '...' : usage ? `${usage.devices.current} / ${usage.devices.limit}` : '0 / 0'}
+                </p>
               </div>
               <Package className="w-8 h-8 text-orange-500" />
             </div>
             <div className="mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-orange-500 h-2 rounded-full" style={{ width: '0%' }}></div>
+                <div className="bg-orange-500 h-2 rounded-full" style={{ width: `${usage?.devices.percentage || 0}%` }}></div>
               </div>
             </div>
           </CardContent>
@@ -97,13 +86,15 @@ export default function PlansPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Storage Used</p>
-                <p className="text-3xl font-bold text-gray-900">0 GB</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoading ? '...' : usage ? `${usage.storage.current_gb} GB` : '0 GB'}
+                </p>
               </div>
               <Database className="w-8 h-8 text-blue-500" />
             </div>
             <div className="mt-4">
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '0%' }}></div>
+                <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${usage?.storage.percentage || 0}%` }}></div>
               </div>
             </div>
           </CardContent>
@@ -114,7 +105,9 @@ export default function PlansPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoading ? '...' : usage ? `${usage.users.current}` : '0'}
+                </p>
               </div>
               <Users className="w-8 h-8 text-green-500" />
             </div>
@@ -125,8 +118,10 @@ export default function PlansPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">API Calls</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-sm text-gray-600">Tickets</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoading ? '...' : usage ? `${usage.tickets.current_month}` : '0'}
+                </p>
               </div>
               <Zap className="w-8 h-8 text-purple-500" />
             </div>
@@ -140,7 +135,11 @@ export default function PlansPage() {
           <CardTitle>Current Plan</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          {!currentPlan ? (
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+            </div>
+          ) : !currentPlan ? (
             <div className="text-center py-8 text-gray-500">
               <CreditCard className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No active subscription</p>
@@ -149,14 +148,14 @@ export default function PlansPage() {
           ) : (
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{currentPlan.name}</h3>
+                <h3 className="text-2xl font-bold text-gray-900">{currentPlan.plan.name}</h3>
                 <p className="text-gray-600 mt-1">
-                  ${currentPlan.price} / {currentPlan.period}
+                  ${currentPlan.plan.price_monthly} / month
                 </p>
               </div>
               <div className="text-right">
-                <Badge variant="success">Active</Badge>
-                <p className="text-sm text-gray-600 mt-2">Renews on {currentPlan.renewDate}</p>
+                <Badge variant={currentPlan.status === 'active' ? 'success' : 'default'}>{currentPlan.status}</Badge>
+                <p className="text-sm text-gray-600 mt-2">Renews on {new Date(currentPlan.current_period_end).toLocaleDateString()}</p>
               </div>
             </div>
           )}
@@ -166,50 +165,62 @@ export default function PlansPage() {
       {/* Available Plans */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Available Plans</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map((plan, index) => (
-            <Card
-              key={index}
-              className={`relative ${plan.recommended ? 'border-2 border-orange-500 shadow-lg' : ''}`}
-            >
-              {plan.recommended && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-orange-500 text-white">Recommended</Badge>
-                </div>
-              )}
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
-                    <span className="text-gray-600">/{plan.period}</span>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading plans...</p>
+          </div>
+        ) : plans.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <Package className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <p className="text-lg font-medium">No plans available</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <Card
+                key={plan.id}
+                className={`relative ${plan.is_popular ? 'border-2 border-orange-500 shadow-lg' : ''}`}
+              >
+                {plan.is_popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-orange-500 text-white">Recommended</Badge>
                   </div>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      {feature.included ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      ) : (
-                        <XCircle className="w-5 h-5 text-gray-300 flex-shrink-0" />
-                      )}
-                      <span className={`text-sm ${feature.included ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {feature.name}
-                      </span>
+                )}
+                <CardContent className="p-6">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+                    <div className="mt-4">
+                      <span className="text-4xl font-bold text-gray-900">${plan.price_monthly}</span>
+                      <span className="text-gray-600">/month</span>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                <Button
-                  className={`w-full ${plan.recommended ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-900 hover:bg-gray-800'}`}
-                >
-                  {plan.recommended ? 'Choose Plan' : 'Select'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  <div className="space-y-3 mb-6">
+                    {plan.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        {feature.included ? (
+                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-gray-300 flex-shrink-0" />
+                        )}
+                        <span className={`text-sm ${feature.included ? 'text-gray-900' : 'text-gray-400'}`}>
+                          {feature.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button
+                    className={`w-full ${plan.is_popular ? 'bg-orange-500 hover:bg-orange-600' : 'bg-gray-900 hover:bg-gray-800'}`}
+                  >
+                    {plan.is_popular ? 'Choose Plan' : 'Select'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Usage History */}

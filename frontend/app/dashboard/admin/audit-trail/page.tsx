@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -20,52 +20,53 @@ import {
   Unlock,
   Database
 } from 'lucide-react';
-
-interface AuditEntry {
-  id: string;
-  user: string;
-  action: string;
-  resource: string;
-  resourceType: string;
-  changeType: 'create' | 'update' | 'delete' | 'access';
-  oldValue?: string;
-  newValue?: string;
-  timestamp: string;
-  ipAddress: string;
-  status: 'success' | 'failed' | 'pending';
-  complianceLevel: 'high' | 'medium' | 'low';
-}
+import { adminService, AuditRecord } from '@/lib/api/services/admin.service';
 
 export default function AuditTrailPage() {
-  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
+  const [auditEntries, setAuditEntries] = useState<AuditRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const getChangeTypeIcon = (changeType: string) => {
-    switch (changeType) {
-      case 'create': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'update': return <AlertTriangle className="w-5 h-5 text-orange-500" />;
-      case 'delete': return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'access': return <Lock className="w-5 h-5 text-blue-500" />;
-      default: return <FileText className="w-5 h-5 text-gray-500" />;
+  useEffect(() => {
+    fetchAuditTrail();
+  }, []);
+
+  const fetchAuditTrail = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await adminService.getAuditTrail();
+      if (response.data) {
+        setAuditEntries(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching audit trail:', err);
+      setError(err.message || 'Failed to load audit trail');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'success': return 'success';
-      case 'failed': return 'danger';
-      case 'pending': return 'warning';
-      default: return 'default';
-    }
-  };
+  // Calculate stats from audit entries
+  const totalEntries = auditEntries.length;
+  const successfulActions = auditEntries.filter(entry => !entry.is_sensitive).length;
+  const failedActions = auditEntries.filter(entry => entry.is_sensitive).length;
+  const highRisk = auditEntries.filter(entry => entry.is_sensitive).length;
 
-  const getComplianceBadgeVariant = (level: string) => {
-    switch (level) {
-      case 'high': return 'danger';
-      case 'medium': return 'warning';
-      case 'low': return 'success';
-      default: return 'default';
-    }
+  // Count by change type (inferred from action)
+  const createdEntries = auditEntries.filter(entry => entry.action.toLowerCase().includes('create')).length;
+  const updatedEntries = auditEntries.filter(entry => entry.action.toLowerCase().includes('update') || entry.action.toLowerCase().includes('edit')).length;
+  const deletedEntries = auditEntries.filter(entry => entry.action.toLowerCase().includes('delete')).length;
+  const accessedEntries = auditEntries.filter(entry => entry.action.toLowerCase().includes('access') || entry.action.toLowerCase().includes('view')).length;
+
+  const getChangeTypeIcon = (action: string) => {
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes('create')) return <CheckCircle className="w-5 h-5 text-green-500" />;
+    if (actionLower.includes('update') || actionLower.includes('edit')) return <AlertTriangle className="w-5 h-5 text-orange-500" />;
+    if (actionLower.includes('delete')) return <XCircle className="w-5 h-5 text-red-500" />;
+    if (actionLower.includes('access') || actionLower.includes('view')) return <Lock className="w-5 h-5 text-blue-500" />;
+    return <FileText className="w-5 h-5 text-gray-500" />;
   };
 
   return (
@@ -95,7 +96,7 @@ export default function AuditTrailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Entries</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : totalEntries}</p>
               </div>
               <FileText className="w-8 h-8 text-blue-500" />
             </div>
@@ -107,7 +108,7 @@ export default function AuditTrailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Successful</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{isLoading ? '...' : successfulActions}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
@@ -118,8 +119,8 @@ export default function AuditTrailPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Failed Actions</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-sm text-gray-600">Sensitive Actions</p>
+                <p className="text-3xl font-bold text-red-600">{isLoading ? '...' : failedActions}</p>
               </div>
               <XCircle className="w-8 h-8 text-red-500" />
             </div>
@@ -131,7 +132,7 @@ export default function AuditTrailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">High Risk</p>
-                <p className="text-3xl font-bold text-orange-600">0</p>
+                <p className="text-3xl font-bold text-orange-600">{isLoading ? '...' : highRisk}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-orange-500" />
             </div>
@@ -149,22 +150,22 @@ export default function AuditTrailPage() {
             <div className="text-center p-4 rounded-lg bg-green-50 border border-green-200">
               <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
               <p className="font-semibold text-gray-900">Created</p>
-              <p className="text-2xl font-bold text-green-600">0</p>
+              <p className="text-2xl font-bold text-green-600">{isLoading ? '...' : createdEntries}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-orange-50 border border-orange-200">
               <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-orange-500" />
               <p className="font-semibold text-gray-900">Updated</p>
-              <p className="text-2xl font-bold text-orange-600">0</p>
+              <p className="text-2xl font-bold text-orange-600">{isLoading ? '...' : updatedEntries}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-red-50 border border-red-200">
               <XCircle className="w-8 h-8 mx-auto mb-2 text-red-500" />
               <p className="font-semibold text-gray-900">Deleted</p>
-              <p className="text-2xl font-bold text-red-600">0</p>
+              <p className="text-2xl font-bold text-red-600">{isLoading ? '...' : deletedEntries}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-blue-50 border border-blue-200">
               <Lock className="w-8 h-8 mx-auto mb-2 text-blue-500" />
               <p className="font-semibold text-gray-900">Accessed</p>
-              <p className="text-2xl font-bold text-blue-600">0</p>
+              <p className="text-2xl font-bold text-blue-600">{isLoading ? '...' : accessedEntries}</p>
             </div>
           </div>
         </CardContent>
@@ -194,7 +195,21 @@ export default function AuditTrailPage() {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          {auditEntries.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p>Loading audit trail...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 text-red-500">
+              <XCircle className="w-16 h-16 mx-auto mb-4" />
+              <p className="text-lg font-medium">Error loading audit trail</p>
+              <p className="text-sm mt-2">{error}</p>
+              <Button variant="primary" className="mt-4" onClick={fetchAuditTrail}>
+                Try Again
+              </Button>
+            </div>
+          ) : auditEntries.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Shield className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No audit entries yet</p>
@@ -208,30 +223,26 @@ export default function AuditTrailPage() {
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
                 >
                   <div className="flex items-start space-x-4 flex-1">
-                    {getChangeTypeIcon(entry.changeType)}
+                    {getChangeTypeIcon(entry.action)}
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{entry.action}</h3>
-                        <Badge variant={getStatusBadgeVariant(entry.status) as any} size="sm">
-                          {entry.status}
-                        </Badge>
-                        <Badge variant={getComplianceBadgeVariant(entry.complianceLevel) as any} size="sm">
-                          {entry.complianceLevel} risk
+                        <Badge variant={entry.is_sensitive ? 'danger' : 'success'} size="sm">
+                          {entry.is_sensitive ? 'Sensitive' : 'Normal'}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">
-                        {entry.resourceType}: {entry.resource}
+                        {entry.event_type} by {entry.actor.name}
                       </p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
                         <span className="flex items-center">
                           <User className="w-3 h-3 mr-1" />
-                          {entry.user}
+                          {entry.actor.email}
                         </span>
                         <span className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
-                          {entry.timestamp}
+                          {new Date(entry.timestamp).toLocaleString()}
                         </span>
-                        <span>{entry.ipAddress}</span>
                       </div>
                     </div>
                   </div>

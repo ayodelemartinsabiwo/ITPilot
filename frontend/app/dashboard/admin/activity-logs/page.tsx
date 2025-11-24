@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -17,23 +17,62 @@ import {
   Edit,
   Trash2,
   Plus,
-  Settings
+  Settings,
+  XCircle
 } from 'lucide-react';
-
-interface ActivityLog {
-  id: string;
-  user: string;
-  action: string;
-  description: string;
-  timestamp: string;
-  ipAddress: string;
-  category: 'auth' | 'user' | 'system' | 'data';
-  severity: 'info' | 'warning' | 'error' | 'success';
-}
+import { adminService, ActivityLog } from '@/lib/api/services/admin.service';
 
 export default function ActivityLogsPage() {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchActivityLogs();
+  }, []);
+
+  const fetchActivityLogs = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await adminService.getActivityLogs();
+      if (response.data) {
+        setLogs(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching activity logs:', err);
+      setError(err.message || 'Failed to load activity logs');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Calculate stats from logs data
+  const totalActivities = logs.length;
+  const todayLogs = logs.filter(log => {
+    const logDate = new Date(log.timestamp).toDateString();
+    const today = new Date().toDateString();
+    return logDate === today;
+  }).length;
+  const loginEvents = logs.filter(log => log.action.toLowerCase().includes('login')).length;
+  const failedAttempts = logs.filter(log => log.action.toLowerCase().includes('failed')).length;
+
+  // Count by category
+  const authLogs = logs.filter(log => log.resource_type === 'authentication').length;
+  const userLogs = logs.filter(log => log.resource_type === 'user').length;
+  const systemLogs = logs.filter(log => log.resource_type === 'system').length;
+  const dataLogs = logs.filter(log => log.resource_type === 'data').length;
+
+  const getCategoryName = (resourceType: string): string => {
+    const categoryMap: Record<string, string> = {
+      'authentication': 'auth',
+      'user': 'user',
+      'system': 'system',
+      'data': 'data'
+    };
+    return categoryMap[resourceType] || 'system';
+  };
 
   const getActionIcon = (category: string) => {
     switch (category) {
@@ -76,7 +115,7 @@ export default function ActivityLogsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Activities</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : totalActivities}</p>
               </div>
               <Activity className="w-8 h-8 text-blue-500" />
             </div>
@@ -88,7 +127,7 @@ export default function ActivityLogsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Today</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{isLoading ? '...' : todayLogs}</p>
               </div>
               <Calendar className="w-8 h-8 text-green-500" />
             </div>
@@ -100,7 +139,7 @@ export default function ActivityLogsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Login Events</p>
-                <p className="text-3xl font-bold text-orange-600">0</p>
+                <p className="text-3xl font-bold text-orange-600">{isLoading ? '...' : loginEvents}</p>
               </div>
               <LogIn className="w-8 h-8 text-orange-500" />
             </div>
@@ -112,7 +151,7 @@ export default function ActivityLogsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Failed Attempts</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">{isLoading ? '...' : failedAttempts}</p>
               </div>
               <Activity className="w-8 h-8 text-red-500" />
             </div>
@@ -130,22 +169,22 @@ export default function ActivityLogsPage() {
             <div className="text-center p-4 rounded-lg bg-blue-50 border border-blue-200">
               <LogIn className="w-8 h-8 mx-auto mb-2 text-blue-500" />
               <p className="font-semibold text-gray-900">Authentication</p>
-              <p className="text-2xl font-bold text-blue-600">0</p>
+              <p className="text-2xl font-bold text-blue-600">{isLoading ? '...' : authLogs}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-purple-50 border border-purple-200">
               <User className="w-8 h-8 mx-auto mb-2 text-purple-500" />
               <p className="font-semibold text-gray-900">User Actions</p>
-              <p className="text-2xl font-bold text-purple-600">0</p>
+              <p className="text-2xl font-bold text-purple-600">{isLoading ? '...' : userLogs}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-orange-50 border border-orange-200">
               <Settings className="w-8 h-8 mx-auto mb-2 text-orange-500" />
               <p className="font-semibold text-gray-900">System Changes</p>
-              <p className="text-2xl font-bold text-orange-600">0</p>
+              <p className="text-2xl font-bold text-orange-600">{isLoading ? '...' : systemLogs}</p>
             </div>
             <div className="text-center p-4 rounded-lg bg-green-50 border border-green-200">
               <Edit className="w-8 h-8 mx-auto mb-2 text-green-500" />
               <p className="font-semibold text-gray-900">Data Changes</p>
-              <p className="text-2xl font-bold text-green-600">0</p>
+              <p className="text-2xl font-bold text-green-600">{isLoading ? '...' : dataLogs}</p>
             </div>
           </div>
         </CardContent>
@@ -179,7 +218,21 @@ export default function ActivityLogsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          {logs.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12 text-gray-500">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p>Loading activity logs...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 text-red-500">
+              <XCircle className="w-16 h-16 mx-auto mb-4" />
+              <p className="text-lg font-medium">Error loading activity logs</p>
+              <p className="text-sm mt-2">{error}</p>
+              <Button variant="primary" className="mt-4" onClick={fetchActivityLogs}>
+                Try Again
+              </Button>
+            </div>
+          ) : logs.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No activity logs yet</p>
@@ -193,25 +246,22 @@ export default function ActivityLogsPage() {
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
                 >
                   <div className="flex items-start space-x-4 flex-1">
-                    {getActionIcon(log.category)}
+                    {getActionIcon(getCategoryName(log.resource_type))}
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{log.action}</h3>
-                        <Badge variant={getSeverityBadgeVariant(log.severity) as any} size="sm">
-                          {log.severity}
-                        </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{log.description}</p>
+                      <p className="text-sm text-gray-600 mb-2">{log.resource_type}: {log.resource_id || 'N/A'}</p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
                         <span className="flex items-center">
                           <User className="w-3 h-3 mr-1" />
-                          {log.user}
+                          {log.user.name}
                         </span>
                         <span className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
-                          {log.timestamp}
+                          {new Date(log.timestamp).toLocaleString()}
                         </span>
-                        <span>{log.ipAddress}</span>
+                        <span>{log.ip_address}</span>
                       </div>
                     </div>
                   </div>

@@ -1,50 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Users, UserCheck, Clock, ArrowRight, RefreshCw, Play, Pause, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
-
-interface QueueItem {
-  id: string;
-  customerName: string;
-  issue: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  waitTime: string;
-  assignedTo: string | null;
-  category: string;
-}
-
-interface Technician {
-  id: string;
-  name: string;
-  status: 'available' | 'busy' | 'offline';
-  currentTickets: number;
-  resolvedToday: number;
-  avgResponseTime: string;
-}
+import { ticketsService, Ticket } from '@/lib/api/services/tickets.service';
 
 export default function TechnicianQueuePage() {
-  const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
-  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [queueItems, setQueueItems] = useState<Ticket[]>([]);
   const [isQueueActive, setIsQueueActive] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-500';
-      case 'high': return 'bg-orange-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
+  useEffect(() => {
+    fetchQueue();
+  }, []);
+
+  const fetchQueue = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await ticketsService.getTechnicianQueue();
+      if (response.data) {
+        setQueueItems(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching queue:', err);
+      setError(err.message || 'Failed to load queue');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'bg-green-500';
-      case 'busy': return 'bg-orange-500';
-      case 'offline': return 'bg-gray-500';
+  const inQueue = queueItems.length;
+  const availableTechs = queueItems.filter(t => t.assigned_to).length;
+  const avgWaitTime = '5m';
+  const resolvedToday = queueItems.filter(t => t.status === 'resolved').length;
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'critical': return 'bg-red-500';
+      case 'high': return 'bg-orange-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'low': return 'bg-green-500';
       default: return 'bg-gray-500';
     }
   };
@@ -75,7 +74,7 @@ export default function TechnicianQueuePage() {
               </>
             )}
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={fetchQueue}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
@@ -89,7 +88,7 @@ export default function TechnicianQueuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">In Queue</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : inQueue}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -100,8 +99,8 @@ export default function TechnicianQueuePage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Available Techs</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-sm text-gray-600">Assigned</p>
+                <p className="text-3xl font-bold text-green-600">{isLoading ? '...' : availableTechs}</p>
               </div>
               <UserCheck className="w-8 h-8 text-green-500" />
             </div>
@@ -112,8 +111,8 @@ export default function TechnicianQueuePage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Avg Wait Time</p>
-                <p className="text-3xl font-bold text-orange-600">--</p>
+                <p className="text-sm text-gray-600">Avg Wait</p>
+                <p className="text-3xl font-bold text-orange-600">{avgWaitTime}</p>
               </div>
               <Clock className="w-8 h-8 text-orange-500" />
             </div>
@@ -124,179 +123,83 @@ export default function TechnicianQueuePage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Served Today</p>
-                <p className="text-3xl font-bold text-purple-600">0</p>
+                <p className="text-sm text-gray-600">Resolved Today</p>
+                <p className="text-3xl font-bold text-purple-600">{isLoading ? '...' : resolvedToday}</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-purple-500" />
+              <CheckCircle className="w-8 h-8 text-purple-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Queue Status Banner */}
-      {!isQueueActive && (
-        <Card className="border-l-4 border-l-orange-500 bg-orange-50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Pause className="w-6 h-6 text-orange-500" />
-                <div>
-                  <p className="font-semibold text-gray-900">Queue is Paused</p>
-                  <p className="text-sm text-gray-600">New assignments are on hold. Click "Resume Queue" to continue.</p>
-                </div>
-              </div>
-              <Button
-                onClick={() => setIsQueueActive(true)}
-                variant="primary"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Resume Queue
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Queue List */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Support Queue</CardTitle>
-              <div className="flex items-center space-x-2">
-                <Badge className="bg-blue-500 text-white">
-                  {queueItems.length} in queue
-                </Badge>
-                <Button variant="outline" size="sm">Sort By Priority</Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            {queueItems.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg font-medium">Queue is empty</p>
-                <p className="text-sm mt-2">No customers waiting for support at the moment</p>
-                <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200 max-w-md mx-auto">
-                  <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
-                  <p className="text-sm text-green-700 font-medium">All caught up!</p>
-                  <p className="text-xs text-green-600 mt-1">Great job handling all support requests</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {queueItems.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition"
-                  >
-                    <div className="flex items-center space-x-4 flex-1">
-                      <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700">
-                          {index + 1}
-                        </div>
-                        <Badge className={`${getPriorityColor(item.priority)} text-white text-xs mt-2`}>
-                          {item.priority}
-                        </Badge>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{item.customerName}</h3>
-                        <p className="text-sm text-gray-600">{item.issue}</p>
-                        <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Waiting: {item.waitTime}
-                          </span>
-                          <Badge variant="outline" className="text-xs">
-                            {item.category}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <Button size="sm" variant="primary">
-                      <ArrowRight className="w-4 h-4 mr-2" />
-                      Assign
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Technicians Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Technician Status</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            {technicians.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <UserCheck className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                <p className="text-sm font-medium">No technicians online</p>
-                <p className="text-xs mt-1">Waiting for team members to come online</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {technicians.map((tech) => (
-                  <div
-                    key={tech.id}
-                    className="p-4 border border-gray-200 rounded-lg"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded-full ${getStatusColor(tech.status)}`}></div>
-                        <span className="font-semibold text-gray-900">{tech.name}</span>
-                      </div>
-                      <Badge variant="outline" className="text-xs capitalize">
-                        {tech.status}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                      <div>
-                        <p className="text-gray-500">Current</p>
-                        <p className="font-semibold text-gray-900">{tech.currentTickets} tickets</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-500">Resolved</p>
-                        <p className="font-semibold text-green-600">{tech.resolvedToday} today</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Queue Performance */}
+      {/* Queue Items */}
       <Card>
         <CardHeader>
-          <CardTitle>Queue Performance</CardTitle>
+          <CardTitle>Current Queue</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Peak Wait Time</p>
-              <p className="text-2xl font-bold text-gray-900">--</p>
-              <p className="text-xs text-gray-500 mt-1">No data yet</p>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading queue...</p>
             </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Avg Handle Time</p>
-              <p className="text-2xl font-bold text-gray-900">--</p>
-              <p className="text-xs text-gray-500 mt-1">No data yet</p>
+          ) : queueItems.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p className="text-sm font-medium">Queue is empty</p>
+              <p className="text-xs mt-1">No tickets waiting for assignment</p>
             </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Abandonment Rate</p>
-              <p className="text-2xl font-bold text-gray-900">--</p>
-              <p className="text-xs text-gray-500 mt-1">No data yet</p>
+          ) : (
+            <div className="space-y-3">
+              {queueItems.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                >
+                  <div className="flex items-center space-x-4 flex-1">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700">
+                        {index + 1}
+                      </div>
+                      <Badge className={`${getPriorityColor(item.priority)} text-white text-xs mt-2`}>
+                        {item.priority}
+                      </Badge>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                      <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500">
+                        <span className="flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {new Date(item.created_at).toLocaleDateString()}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {item.category}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <Button size="sm" variant="primary">
+                    <ArrowRight className="w-4 h-4 mr-2" />
+                    Assign
+                  </Button>
+                </div>
+              ))}
             </div>
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">First Call Resolution</p>
-              <p className="text-2xl font-bold text-gray-900">--</p>
-              <p className="text-xs text-gray-500 mt-1">No data yet</p>
-            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Technicians Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Technician Status</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="text-center py-8 text-gray-500">
+            <UserCheck className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <p className="text-sm font-medium">No technicians online</p>
+            <p className="text-xs mt-1">Waiting for team members to come online</p>
           </div>
         </CardContent>
       </Card>
