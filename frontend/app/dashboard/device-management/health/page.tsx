@@ -17,7 +17,7 @@ export default function DeviceHealthPage() {
     },
   })
 
-  const devices = devicesData?.data || []
+  const devices = devicesData || []
 
   // Calculate health statistics
   const healthStats = useMemo(() => {

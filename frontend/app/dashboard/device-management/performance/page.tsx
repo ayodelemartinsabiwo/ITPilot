@@ -18,7 +18,7 @@ export default function PerformanceMetricsPage() {
     },
   })
 
-  const devices = devicesData?.data || []
+  const devices = devicesData || []
 
   // Generate simulated performance data based on actual device health scores
   const mockChartData = useMemo(() => {

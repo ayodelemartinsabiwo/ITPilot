@@ -17,7 +17,7 @@ export default function OptimizationToolsPage() {
     },
   })
 
-  const devices = devicesData?.data || []
+  const devices = devicesData || []
 
   // Calculate optimization potential
   const optimizationStats = useMemo(() => {

@@ -17,7 +17,7 @@ export default function ComplianceCheckPage() {
     },
   })
 
-  const devices = devicesData?.data || []
+  const devices = devicesData || []
 
   // Calculate compliance statistics
   const complianceStats = useMemo(() => {

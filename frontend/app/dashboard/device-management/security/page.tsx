@@ -17,7 +17,7 @@ export default function SecurityStatusPage() {
     },
   })
 
-  const devices = devicesData?.data || []
+  const devices = devicesData || []
 
   // Calculate security statistics
   const securityStats = useMemo(() => {
