@@ -3,9 +3,52 @@
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Zap, TrendingUp, HardDrive, Cpu, Settings, Sparkles, Target } from 'lucide-react'
+import { Zap, TrendingUp, HardDrive, Cpu, Settings, Sparkles, Target, Loader2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { devicesService } from '@/lib/api/services/devices.service'
+import { useMemo } from 'react'
 
 export default function OptimizationToolsPage() {
+  const { data: devicesData, isLoading: devicesLoading } = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
+      const response = await devicesService.getDevices()
+      return response.data
+    },
+  })
+
+  const devices = devicesData?.data || []
+
+  // Calculate optimization potential
+  const optimizationStats = useMemo(() => {
+    if (!devices.length) {
+      return {
+        overallPotential: 0,
+        cpuOptimization: 0,
+        storageCleanup: 0,
+        performanceBoost: 0,
+        devicesNeedingOptimization: 0,
+      }
+    }
+
+    const avgHealth = devices.reduce((sum, d) => sum + d.health_score, 0) / devices.length
+    const overallPotential = Math.round(100 - avgHealth)
+
+    // Estimate optimization potential for different categories
+    const cpuOptimization = Math.round(overallPotential * 0.3)
+    const storageCleanup = Math.round((devices.length * 2.5) * (overallPotential / 100)) // GB
+    const performanceBoost = Math.round(overallPotential * 0.4)
+    const devicesNeedingOptimization = devices.filter(d => d.health_score < 80).length
+
+    return {
+      overallPotential,
+      cpuOptimization,
+      storageCleanup,
+      performanceBoost,
+      devicesNeedingOptimization,
+    }
+  }, [devices])
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -14,7 +57,7 @@ export default function OptimizationToolsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Optimization Tools</h1>
           <p className="text-gray-600 mt-1">Improve device performance and efficiency</p>
         </div>
-        <Button variant="primary">
+        <Button variant="primary" disabled={devicesLoading || devices.length === 0}>
           <Zap className="w-4 h-4 mr-2" />
           Optimize All
         </Button>
@@ -25,13 +68,24 @@ export default function OptimizationToolsPage() {
         <CardContent className="p-8">
           <div className="text-center">
             <p className="text-lg opacity-90 mb-2">Optimization Potential</p>
-            <div className="flex items-center justify-center gap-4">
-              <Sparkles className="w-16 h-16 opacity-90" />
-              <div>
-                <div className="text-6xl font-bold">--</div>
-                <p className="text-sm opacity-90">No optimization data</p>
+            {devicesLoading ? (
+              <Loader2 className="w-12 h-12 mx-auto animate-spin" />
+            ) : (
+              <div className="flex items-center justify-center gap-4">
+                <Sparkles className="w-16 h-16 opacity-90" />
+                <div>
+                  <div className="text-6xl font-bold">
+                    {devices.length > 0 ? `${optimizationStats.overallPotential}%` : '--'}
+                  </div>
+                  <p className="text-sm opacity-90">
+                    {devices.length > 0
+                      ? `${optimizationStats.devicesNeedingOptimization} device${optimizationStats.devicesNeedingOptimization !== 1 ? 's' : ''} can be optimized`
+                      : 'No optimization data'
+                    }
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -46,10 +100,12 @@ export default function OptimizationToolsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">CPU Optimization</p>
-                <p className="text-2xl font-bold text-gray-900">0%</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {devices.length > 0 ? `${optimizationStats.cpuOptimization}%` : '0%'}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full" disabled={devices.length === 0}>
               Optimize CPU
             </Button>
           </CardContent>
@@ -63,10 +119,12 @@ export default function OptimizationToolsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Storage Cleanup</p>
-                <p className="text-2xl font-bold text-gray-900">0 GB</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {devices.length > 0 ? `${optimizationStats.storageCleanup} GB` : '0 GB'}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full" disabled={devices.length === 0}>
               Clean Storage
             </Button>
           </CardContent>
@@ -80,10 +138,12 @@ export default function OptimizationToolsPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600">Performance Boost</p>
-                <p className="text-2xl font-bold text-gray-900">--</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {devices.length > 0 ? `${optimizationStats.performanceBoost}%` : '--'}
+                </p>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full" disabled={devices.length === 0}>
               Boost Performance
             </Button>
           </CardContent>
@@ -166,20 +226,65 @@ export default function OptimizationToolsPage() {
         </CardContent>
       </Card>
 
-      {/* Optimization History */}
+      {/* Devices Needing Optimization */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Optimization History</CardTitle>
-            <Button variant="outline" size="sm">View All</Button>
+            <CardTitle>Devices Needing Optimization</CardTitle>
+            <Badge className={optimizationStats.devicesNeedingOptimization > 0 ? 'bg-orange-500' : 'bg-green-500'}>
+              {optimizationStats.devicesNeedingOptimization} Devices
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="text-center py-12 text-gray-500">
-            <Sparkles className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-            <p className="text-lg font-medium">No optimization history</p>
-            <p className="text-sm mt-2">Run optimizations to see results here</p>
-          </div>
+          {devices.length > 0 && optimizationStats.devicesNeedingOptimization > 0 ? (
+            <div className="space-y-3">
+              {devices
+                .filter(d => d.health_score < 80)
+                .slice(0, 5)
+                .map(device => {
+                  const optimizationPotential = 100 - device.health_score
+                  return (
+                    <div
+                      key={device.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                    >
+                      <div className="flex items-center gap-4">
+                        <Sparkles className="w-5 h-5 text-purple-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">{device.device_name}</p>
+                          <p className="text-sm text-gray-600">
+                            {device.device_type} • {device.operating_system} • Health: {device.health_score}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600">Optimization Potential</p>
+                          <p className="text-lg font-bold text-purple-600">{optimizationPotential}%</p>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          Optimize
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <Sparkles className="w-16 h-16 mx-auto mb-4 text-green-400" />
+              <p className="text-lg font-medium">
+                {devices.length > 0 ? 'All devices optimized' : 'No devices to optimize'}
+              </p>
+              <p className="text-sm mt-2">
+                {devices.length > 0
+                  ? 'Your devices are running at peak performance'
+                  : 'Connect devices to start optimization'
+                }
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
