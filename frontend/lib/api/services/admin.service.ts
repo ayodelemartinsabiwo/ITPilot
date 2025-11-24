@@ -6,7 +6,7 @@
 import { api, ApiResponse } from '../client'
 import { API_ENDPOINTS } from '../config'
 
-export interface User {
+export interface AdminUser {
   id: string
   email: string
   first_name: string
@@ -114,29 +114,29 @@ class AdminService {
   /**
    * Get all users in organization
    */
-  async getUsers(): Promise<ApiResponse<User[]>> {
-    return api.get<ApiResponse<User[]>>(API_ENDPOINTS.users.list)
+  async getUsers(): Promise<ApiResponse<AdminUser[]>> {
+    return api.get<ApiResponse<AdminUser[]>>(API_ENDPOINTS.users.list)
   }
 
   /**
    * Get single user by ID
    */
-  async getUser(id: string): Promise<ApiResponse<User>> {
-    return api.get<ApiResponse<User>>(API_ENDPOINTS.users.detail(id))
+  async getUser(id: string): Promise<ApiResponse<AdminUser>> {
+    return api.get<ApiResponse<AdminUser>>(API_ENDPOINTS.users.detail(id))
   }
 
   /**
    * Create new user
    */
-  async createUser(data: CreateUserData): Promise<ApiResponse<User>> {
-    return api.post<ApiResponse<User>>(API_ENDPOINTS.users.list, data)
+  async createUser(data: CreateUserData): Promise<ApiResponse<AdminUser>> {
+    return api.post<ApiResponse<AdminUser>>(API_ENDPOINTS.users.list, data)
   }
 
   /**
    * Update user
    */
-  async updateUser(id: string, data: UpdateUserData): Promise<ApiResponse<User>> {
-    return api.patch<ApiResponse<User>>(API_ENDPOINTS.users.detail(id), data)
+  async updateUser(id: string, data: UpdateUserData): Promise<ApiResponse<AdminUser>> {
+    return api.patch<ApiResponse<AdminUser>>(API_ENDPOINTS.users.detail(id), data)
   }
 
   /**
@@ -251,8 +251,8 @@ class AdminService {
   /**
    * Get organization members
    */
-  async getOrganizationMembers(): Promise<ApiResponse<User[]>> {
-    return api.get<ApiResponse<User[]>>('/organizations/me/members/')
+  async getOrganizationMembers(): Promise<ApiResponse<AdminUser[]>> {
+    return api.get<ApiResponse<AdminUser[]>>('/organizations/me/members/')
   }
 
   /**
