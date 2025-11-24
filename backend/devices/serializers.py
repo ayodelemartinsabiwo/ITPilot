@@ -40,6 +40,30 @@ class DeviceSerializer(serializers.ModelSerializer):
         """Get device health status."""
         return obj.get_health_status()
 
+    def create(self, validated_data):
+        """Create device with auto-generated device_id."""
+        import uuid
+        from organizations.models import OrganizationMember
+
+        # Generate unique device_id if not provided
+        if 'device_id' not in validated_data or not validated_data.get('device_id'):
+            validated_data['device_id'] = f"DEV-{uuid.uuid4().hex[:12].upper()}"
+
+        # Set organization from user if not provided
+        if 'organization' not in validated_data:
+            org_membership = OrganizationMember.objects.filter(
+                user=self.context['request'].user,
+                is_active=True
+            ).first()
+            if org_membership:
+                validated_data['organization'] = org_membership.organization
+
+        # Set user from request if not provided
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+
+        return super().create(validated_data)
+
 
 class DeviceHealthSerializer(serializers.ModelSerializer):
     """Serializer for DeviceHealth model."""

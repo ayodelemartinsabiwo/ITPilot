@@ -1,11 +1,33 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Mail, Calendar, Users, FileText, Cloud, CheckCircle, Settings } from 'lucide-react'
+import { Mail, Calendar, Users, FileText, Cloud, CheckCircle, Settings, Loader2 } from 'lucide-react'
+import { integrationsAPI } from '@/lib/api'
+import { toast } from 'sonner'
 
 export default function Microsoft365Page() {
+  const { data: integrationsData, isLoading } = useQuery({
+    queryKey: ['integrations', 'MICROSOFT_365'],
+    queryFn: async () => {
+      try {
+        const response = await integrationsAPI.getAll({ integration_type: 'MICROSOFT_365' })
+        return response.data
+      } catch (error) {
+        console.error('Failed to fetch Microsoft 365 integrations:', error)
+        return { results: [] }
+      }
+    },
+  })
+
+  const integration = integrationsData?.results?.[0]
+  const isConnected = integration?.status === 'ACTIVE'
+
+  const handleConfigureIntegration = () => {
+    toast.info('Integration configuration coming soon!')
+  }
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -14,22 +36,28 @@ export default function Microsoft365Page() {
           <h1 className="text-3xl font-bold text-gray-900">Microsoft 365 Integration</h1>
           <p className="text-gray-600 mt-1">Manage your Microsoft 365 services and connections</p>
         </div>
-        <Button variant="primary">
+        <Button variant="primary" onClick={handleConfigureIntegration}>
           <Settings className="w-4 h-4 mr-2" />
-          Configure Integration
+          {isConnected ? 'Manage Integration' : 'Configure Integration'}
         </Button>
       </div>
 
       {/* Connection Status */}
-      <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+      <Card className={`bg-gradient-to-br ${isConnected ? 'from-green-500 to-green-600' : 'from-blue-500 to-blue-600'} text-white`}>
         <CardContent className="p-8">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-lg opacity-90 mb-2">Connection Status</p>
               <div className="flex items-center gap-2">
-                <div className="text-3xl font-bold">Not Connected</div>
+                <div className="text-3xl font-bold">
+                  {isLoading ? 'Loading...' : (isConnected ? 'Connected' : 'Not Connected')}
+                </div>
               </div>
-              <p className="text-sm opacity-75 mt-2">Configure your Microsoft 365 integration to get started</p>
+              <p className="text-sm opacity-75 mt-2">
+                {isConnected
+                  ? `Last synced: ${integration?.last_sync_at ? new Date(integration.last_sync_at).toLocaleString() : 'Never'}`
+                  : 'Configure your Microsoft 365 integration to get started'}
+              </p>
             </div>
             <Cloud className="w-20 h-20 opacity-20" />
           </div>
@@ -49,6 +77,16 @@ export default function Microsoft365Page() {
             </div>
           </CardContent>
         </Card>
+
+        {isLoading && (
+          <Card className="border-l-4 border-l-gray-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="border-l-4 border-l-green-500">
           <CardContent className="p-6">
@@ -100,7 +138,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">Exchange Online</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Email and calendar services</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
 
             <div className="p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition">
@@ -109,7 +149,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">Microsoft Teams</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Chat, meetings, and collaboration</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
 
             <div className="p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition">
@@ -118,7 +160,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">SharePoint Online</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Document management and storage</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
 
             <div className="p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition">
@@ -127,7 +171,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">OneDrive</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Personal cloud storage</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
 
             <div className="p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition">
@@ -136,7 +182,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">Outlook Calendar</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Calendar and scheduling</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
 
             <div className="p-4 rounded-lg border border-gray-200 hover:border-orange-300 transition">
@@ -145,7 +193,9 @@ export default function Microsoft365Page() {
                 <h3 className="font-semibold">Azure AD</h3>
               </div>
               <p className="text-sm text-gray-600 mb-3">Identity and access management</p>
-              <Badge className="bg-gray-200 text-gray-700">Not Connected</Badge>
+              <Badge className={isConnected ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'}>
+                {isConnected ? 'Connected' : 'Not Connected'}
+              </Badge>
             </div>
           </div>
         </CardContent>
@@ -163,10 +213,14 @@ export default function Microsoft365Page() {
           <div className="text-center py-12 text-gray-500">
             <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No activity yet</p>
-            <p className="text-sm mt-2">Connect your Microsoft 365 account to start syncing data</p>
-            <Button variant="primary" className="mt-4">
+            <p className="text-sm mt-2">
+              {isConnected
+                ? 'Sync activity will appear here once available'
+                : 'Connect your Microsoft 365 account to start syncing data'}
+            </p>
+            <Button variant="primary" className="mt-4" onClick={handleConfigureIntegration}>
               <Settings className="w-4 h-4 mr-2" />
-              Configure Integration
+              {isConnected ? 'Manage Integration' : 'Configure Integration'}
             </Button>
           </div>
         </CardContent>

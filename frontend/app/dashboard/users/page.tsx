@@ -15,19 +15,27 @@ import {
   UserCheck,
   UserX,
 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { EditUserModal } from '@/components/modals/EditUserModal'
+import { InviteUserModal } from '@/components/modals/InviteUserModal'
 import { usersAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store'
+import { toast } from 'sonner'
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [userToEdit, setUserToEdit] = useState<any>(null)
+  const [userToRemove, setUserToRemove] = useState<any>(null)
   const { user: currentUser } = useAuthStore()
+  const queryClient = useQueryClient()
 
   const { data: usersData, isLoading } = useQuery({
     queryKey: ['users', searchQuery, roleFilter],
@@ -44,11 +52,40 @@ export default function UsersPage() {
         return { results: [] }
       }
     },
-    enabled: false, // Disable auto-fetch until backend endpoint is ready
-    initialData: { results: [] },
+  })
+
+  const removeUserMutation = useMutation({
+    mutationFn: (userId: string) => usersAPI.removeUser(userId),
+    onSuccess: () => {
+      toast.success('User removed successfully')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      setUserToRemove(null)
+    },
+    onError: () => {
+      toast.error('Failed to remove user')
+    },
   })
 
   const users = usersData?.results || []
+
+  const handleInviteUser = () => {
+    setShowInviteModal(true)
+  }
+
+  const handleEditUser = (user: any) => {
+    setUserToEdit(user)
+    setShowEditModal(true)
+  }
+
+  const handleRemoveUser = (user: any) => {
+    setUserToRemove(user)
+  }
+
+  const confirmRemove = () => {
+    if (userToRemove) {
+      removeUserMutation.mutate(userToRemove.id)
+    }
+  }
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role.toLowerCase()) {
@@ -96,7 +133,10 @@ export default function UsersPage() {
             Manage team members and permissions
           </p>
         </div>
-        <Button leftIcon={<Plus className="w-5 h-5" />}>
+        <Button
+          leftIcon={<Plus className="w-5 h-5" />}
+          onClick={handleInviteUser}
+        >
           Invite User
         </Button>
       </div>
@@ -199,11 +239,23 @@ export default function UsersPage() {
                   </div>
 
                   <div className="flex gap-2 pt-4 border-t border-gray-100">
-                    <button className="flex-1 p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleEditUser(user)
+                      }}
+                      className="flex-1 p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
                       <Edit className="w-4 h-4" />
                       Edit
                     </button>
-                    <button className="flex-1 p-2 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2 text-sm text-red-600">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRemoveUser(user)
+                      }}
+                      className="flex-1 p-2 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2 text-sm text-red-600"
+                    >
                       <Trash2 className="w-4 h-4" />
                       Remove
                     </button>
@@ -225,11 +277,63 @@ export default function UsersPage() {
             <p className="text-gray-600 mb-6">
               Get started by inviting team members
             </p>
-            <Button leftIcon={<Plus className="w-5 h-5" />}>
+            <Button
+              leftIcon={<Plus className="w-5 h-5" />}
+              onClick={handleInviteUser}
+            >
               Invite User
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Invite User Modal */}
+      <InviteUserModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+      />
+
+      {/* Edit User Modal */}
+      {userToEdit && (
+        <EditUserModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false)
+            setUserToEdit(null)
+          }}
+          user={userToEdit}
+        />
+      )}
+
+      {/* Remove User Confirmation Modal */}
+      {userToRemove && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Remove User
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to remove "{userToRemove.full_name || userToRemove.email}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setUserToRemove(null)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={confirmRemove}
+                className="flex-1"
+                disabled={removeUserMutation.isPending}
+              >
+                {removeUserMutation.isPending ? 'Removing...' : 'Remove'}
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

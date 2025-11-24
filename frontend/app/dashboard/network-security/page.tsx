@@ -4,15 +4,33 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { networkSecurityService, NetworkSecurityStats } from '@/lib/api/services';
 
 export default function NetworkSecurityPage() {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<NetworkSecurityStats | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: Fetch data from API
-    setLoading(false);
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await networkSecurityService.getStats();
+      if (response.data) {
+        setStats(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching network security data:', err);
+      setError(err.message || 'Failed to load network security data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -35,7 +53,9 @@ export default function NetworkSecurityPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Network Health</p>
-                <p className="text-3xl font-bold text-blue-600">Good</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {loading ? '...' : stats?.network_health || 'N/A'}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <span className="text-2xl">📡</span>
@@ -49,7 +69,9 @@ export default function NetworkSecurityPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Threats</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {loading ? '...' : stats?.active_threats || 0}
+                </p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
                 <span className="text-2xl">⚠️</span>
@@ -63,7 +85,9 @@ export default function NetworkSecurityPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending Patches</p>
-                <p className="text-3xl font-bold text-yellow-600">0</p>
+                <p className="text-3xl font-bold text-yellow-600">
+                  {loading ? '...' : stats?.pending_patches || 0}
+                </p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-full">
                 <span className="text-2xl">📦</span>
@@ -77,7 +101,9 @@ export default function NetworkSecurityPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Protected Devices</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {loading ? '...' : stats?.protected_devices || 0}
+                </p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <span className="text-2xl">🛡️</span>

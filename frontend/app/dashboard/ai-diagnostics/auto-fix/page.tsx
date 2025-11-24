@@ -1,31 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Wrench, PlayCircle, CheckCircle, XCircle, Clock, AlertTriangle, History, Settings } from 'lucide-react';
-
-interface AutoFixAction {
-  id: string;
-  issueTitle: string;
-  device: string;
-  fixType: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  impact: 'low' | 'medium' | 'high';
-  createdAt: string;
-  completedAt?: string;
-  result?: string;
-  autoExecute: boolean;
-}
+import { aiDiagnosticsService, AutoFixAction } from '@/lib/api/services';
 
 export default function AutoFixPage() {
   const [actions, setActions] = useState<AutoFixAction[]>([]);
   const [autoFixEnabled, setAutoFixEnabled] = useState(true);
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchActions();
+  }, []);
+
+  const fetchActions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await aiDiagnosticsService.getAutoFixActions({ ordering: '-created_at' });
+
+      if (response.data) {
+        setActions(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (err: any) {
+      console.error('Error fetching auto-fix actions:', err);
+      setError(err.message || 'Failed to load auto-fix actions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'running':
@@ -38,7 +49,7 @@ export default function AutoFixPage() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
         return 'border-l-green-500 bg-green-50';
       case 'running':
@@ -50,16 +61,29 @@ export default function AutoFixPage() {
     }
   };
 
-  const executeAutoFix = (id: string) => {
-    setActions(actions.map(action =>
-      action.id === id ? { ...action, status: 'running' as const } : action
-    ));
-    // TODO: Execute auto-fix via API
+  const executeAutoFix = async (id: string) => {
+    try {
+      setActions(actions.map(action =>
+        action.id === id ? { ...action, status: 'RUNNING' as const } : action
+      ));
+
+      await aiDiagnosticsService.executeAutoFix(id);
+      await fetchActions(); // Refresh the list
+    } catch (err: any) {
+      console.error('Error executing auto-fix:', err);
+      setError(err.message || 'Failed to execute auto-fix');
+    }
   };
 
-  const executeSelectedFixes = () => {
-    selectedActions.forEach(id => executeAutoFix(id));
-    setSelectedActions([]);
+  const executeSelectedFixes = async () => {
+    try {
+      await Promise.all(selectedActions.map(id => aiDiagnosticsService.executeAutoFix(id)));
+      setSelectedActions([]);
+      await fetchActions(); // Refresh the list
+    } catch (err: any) {
+      console.error('Error executing selected fixes:', err);
+      setError(err.message || 'Failed to execute selected fixes');
+    }
   };
 
   return (
@@ -89,7 +113,9 @@ export default function AutoFixPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Available Fixes</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {loading ? '...' : actions.filter(a => a.status === 'PENDING').length}
+                </p>
               </div>
               <Wrench className="w-8 h-8 text-orange-500" />
             </div>
@@ -101,7 +127,9 @@ export default function AutoFixPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">In Progress</p>
-                <p className="text-3xl font-bold text-blue-600">0</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {loading ? '...' : actions.filter(a => a.status === 'RUNNING').length}
+                </p>
               </div>
               <Clock className="w-8 h-8 text-blue-500" />
             </div>
@@ -113,7 +141,9 @@ export default function AutoFixPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {loading ? '...' : actions.filter(a => a.status === 'COMPLETED').length}
+                </p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
@@ -125,7 +155,9 @@ export default function AutoFixPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Failed</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {loading ? '...' : actions.filter(a => a.status === 'FAILED').length}
+                </p>
               </div>
               <XCircle className="w-8 h-8 text-red-500" />
             </div>

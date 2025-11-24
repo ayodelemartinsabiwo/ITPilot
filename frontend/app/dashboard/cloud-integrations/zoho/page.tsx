@@ -1,11 +1,33 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Mail, Cloud, Users, Briefcase, Settings, CheckCircle, FileText, DollarSign } from 'lucide-react'
+import { Mail, Cloud, Users, Briefcase, Settings, CheckCircle, FileText, DollarSign, Loader2 } from 'lucide-react'
+import { integrationsAPI } from '@/lib/api'
+import { toast } from 'sonner'
 
 export default function ZohoPage() {
+  const { data: integrationsData, isLoading } = useQuery({
+    queryKey: ['integrations'],
+    queryFn: async () => {
+      try {
+        const response = await integrationsAPI.getAll()
+        return response.data
+      } catch (error) {
+        console.error('Failed to fetch integrations:', error)
+        return { results: [] }
+      }
+    },
+  })
+
+  const integrations = integrationsData?.results || []
+  const hasAnyIntegration = integrations.length > 0
+
+  const handleAddIntegration = () => {
+    toast.info('Integration configuration coming soon!')
+  }
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -14,7 +36,7 @@ export default function ZohoPage() {
           <h1 className="text-3xl font-bold text-gray-900">Zoho & Other Cloud Services</h1>
           <p className="text-gray-600 mt-1">Manage integrations with Zoho and other cloud platforms</p>
         </div>
-        <Button variant="primary">
+        <Button variant="primary" onClick={handleAddIntegration}>
           <Settings className="w-4 h-4 mr-2" />
           Add Integration
         </Button>
@@ -27,7 +49,9 @@ export default function ZohoPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Integrations</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {isLoading ? '...' : integrations.length}
+                </p>
               </div>
               <Cloud className="w-8 h-8 text-blue-500" />
             </div>
@@ -184,8 +208,12 @@ export default function ZohoPage() {
           <div className="text-center py-12 text-gray-500">
             <Cloud className="w-16 h-16 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium">No integrations configured</p>
-            <p className="text-sm mt-2">Add your first cloud service integration to get started</p>
-            <Button variant="primary" className="mt-4">
+            <p className="text-sm mt-2">
+              {hasAnyIntegration
+                ? 'Integration activity will appear here once available'
+                : 'Add your first cloud service integration to get started'}
+            </p>
+            <Button variant="primary" className="mt-4" onClick={handleAddIntegration}>
               <Settings className="w-4 h-4 mr-2" />
               Add Integration
             </Button>

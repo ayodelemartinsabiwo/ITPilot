@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Activity, Play, Pause, RefreshCw, CheckCircle, AlertTriangle, XCircle, Clock } from 'lucide-react';
+import { aiDiagnosticsService, DiagnosticScan } from '@/lib/api/services';
 
 interface ScanProgress {
   currentDevice: string;
@@ -17,16 +18,48 @@ interface ScanProgress {
 export default function RealTimeScanPage() {
   const [scanning, setScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState<ScanProgress | null>(null);
-  const [recentScans, setRecentScans] = useState<any[]>([]);
+  const [recentScans, setRecentScans] = useState<DiagnosticScan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const startScan = () => {
-    setScanning(true);
-    // TODO: Implement real-time scan via API
+  useEffect(() => {
+    fetchRecentScans();
+  }, []);
+
+  const fetchRecentScans = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await aiDiagnosticsService.getScans({ ordering: '-created_at' });
+
+      if (response.data) {
+        setRecentScans(Array.isArray(response.data) ? response.data.slice(0, 5) : []);
+      }
+    } catch (err: any) {
+      console.error('Error fetching recent scans:', err);
+      setError(err.message || 'Failed to load recent scans');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startScan = async () => {
+    try {
+      setScanning(true);
+      setError(null);
+      // This would typically create a scan and start it
+      // For now, we'll just set the scanning state
+      // In a real implementation, you'd create a scan for each device
+      // await aiDiagnosticsService.createScan({ device: deviceId, scan_type: 'FULL' });
+    } catch (err: any) {
+      console.error('Error starting scan:', err);
+      setError(err.message || 'Failed to start scan');
+      setScanning(false);
+    }
   };
 
   const pauseScan = () => {
     setScanning(false);
-    // TODO: Pause scan via API
   };
 
   return (

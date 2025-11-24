@@ -12,19 +12,25 @@ import {
   Trash2,
   Activity,
 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { AddDeviceModal } from '@/components/modals/AddDeviceModal'
+import { EditDeviceModal } from '@/components/modals/EditDeviceModal'
 import { devicesAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function DevicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [deviceToEdit, setDeviceToEdit] = useState<any>(null)
+  const [deviceToDelete, setDeviceToDelete] = useState<any>(null)
+  const queryClient = useQueryClient()
 
   const { data: devicesData, isLoading } = useQuery({
     queryKey: ['devices', searchQuery, statusFilter],
@@ -38,7 +44,34 @@ export default function DevicesPage() {
     },
   })
 
+  const deleteDeviceMutation = useMutation({
+    mutationFn: (deviceId: string) => devicesAPI.delete(deviceId),
+    onSuccess: () => {
+      toast.success('Device deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['devices'] })
+      setDeviceToDelete(null)
+    },
+    onError: () => {
+      toast.error('Failed to delete device')
+    },
+  })
+
   const devices = devicesData?.results || []
+
+  const handleEditDevice = (device: any) => {
+    setDeviceToEdit(device)
+    setShowEditModal(true)
+  }
+
+  const handleDeleteDevice = (device: any) => {
+    setDeviceToDelete(device)
+  }
+
+  const confirmDelete = () => {
+    if (deviceToDelete) {
+      deleteDeviceMutation.mutate(deviceToDelete.id)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -168,10 +201,22 @@ export default function DevicesPage() {
                       Last seen {formatRelativeTime(device.last_seen || new Date())}
                     </span>
                     <div className="flex gap-2">
-                      <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditDevice(device)
+                        }}
+                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
-                      <button className="p-2 rounded-lg hover:bg-red-50 transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteDevice(device)
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
@@ -208,6 +253,49 @@ export default function DevicesPage() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
       />
+
+      {/* Edit Device Modal */}
+      {deviceToEdit && (
+        <EditDeviceModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false)
+            setDeviceToEdit(null)
+          }}
+          device={deviceToEdit}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deviceToDelete && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Device
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete "{deviceToDelete.name}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setDeviceToDelete(null)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={confirmDelete}
+                className="flex-1"
+                disabled={deleteDeviceMutation.isPending}
+              >
+                {deleteDeviceMutation.isPending ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

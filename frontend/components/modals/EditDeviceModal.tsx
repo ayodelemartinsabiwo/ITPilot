@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Laptop, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -9,12 +9,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { devicesAPI } from '@/lib/api'
 import { toast } from 'sonner'
 
-interface AddDeviceModalProps {
+interface EditDeviceModalProps {
   isOpen: boolean
   onClose: () => void
+  device: any
 }
 
-export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
+export function EditDeviceModal({ isOpen, onClose, device }: EditDeviceModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     device_type: 'DESKTOP',
@@ -26,32 +27,38 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
 
   const queryClient = useQueryClient()
 
-  const createDeviceMutation = useMutation({
+  // Initialize form data when device changes
+  useEffect(() => {
+    if (device) {
+      setFormData({
+        name: device.name || '',
+        device_type: device.device_type || device.type || 'DESKTOP',
+        ip_address: device.ip_address || '',
+        mac_address: device.mac_address || '',
+        os_type: device.os_type || device.os || 'WINDOWS',
+        notes: device.notes || '',
+      })
+    }
+  }, [device])
+
+  const updateDeviceMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await devicesAPI.create(data)
+      const response = await devicesAPI.update(device.id, data)
       return response.data
     },
     onSuccess: () => {
-      toast.success('Device added successfully!')
+      toast.success('Device updated successfully!')
       queryClient.invalidateQueries({ queryKey: ['devices'] })
       onClose()
-      setFormData({
-        name: '',
-        device_type: 'DESKTOP',
-        ip_address: '',
-        mac_address: '',
-        os_type: 'WINDOWS',
-        notes: '',
-      })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to add device')
+      toast.error(error.response?.data?.message || 'Failed to update device')
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    createDeviceMutation.mutate(formData)
+    updateDeviceMutation.mutate(formData)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -87,7 +94,7 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
                     <Laptop className="w-5 h-5 text-white" />
                   </div>
-                  <h2 className="text-xl font-semibold text-gray-900">Add New Device</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Edit Device</h2>
                 </div>
                 <button
                   onClick={onClose}
@@ -186,22 +193,22 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
                     variant="outline"
                     onClick={onClose}
                     className="flex-1"
-                    disabled={createDeviceMutation.isPending}
+                    disabled={updateDeviceMutation.isPending}
                   >
                     Cancel
                   </Button>
                   <Button
                     type="submit"
                     className="flex-1"
-                    disabled={createDeviceMutation.isPending}
+                    disabled={updateDeviceMutation.isPending}
                   >
-                    {createDeviceMutation.isPending ? (
+                    {updateDeviceMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Adding...
+                        Updating...
                       </>
                     ) : (
-                      'Add Device'
+                      'Update Device'
                     )}
                   </Button>
                 </div>

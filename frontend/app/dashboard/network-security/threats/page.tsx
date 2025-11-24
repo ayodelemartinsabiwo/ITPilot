@@ -16,15 +16,33 @@ import {
   Bell,
   Eye,
 } from 'lucide-react';
+import { networkSecurityService, ThreatDetection } from '@/lib/api/services';
 
 export default function ThreatsPage() {
   const [loading, setLoading] = useState(true);
-  const [threats, setThreats] = useState<any[]>([]);
+  const [threats, setThreats] = useState<ThreatDetection[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: Fetch data from API
-    setLoading(false);
+    fetchThreats();
   }, []);
+
+  const fetchThreats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await networkSecurityService.getThreats({ ordering: '-detected_at' });
+
+      if (response.data) {
+        setThreats(Array.isArray(response.data) ? response.data : []);
+      }
+    } catch (err: any) {
+      console.error('Error fetching threats:', err);
+      setError(err.message || 'Failed to load threats');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {

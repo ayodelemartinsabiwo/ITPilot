@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   User,
@@ -19,12 +19,41 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { useAuthStore } from '@/lib/store'
+import { useMutation } from '@tanstack/react-query'
+import { settingsAPI, usersAPI } from '@/lib/api'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const [activeTab, setActiveTab] = useState('profile')
-  const [isSaving, setIsSaving] = useState(false)
+
+  const [profileData, setProfileData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+  })
+
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: '',
+  })
+
+  const [preferencesData, setPreferencesData] = useState({
+    language: 'English',
+    timezone: 'Africa/Lagos (WAT)',
+    date_format: 'MM/DD/YYYY',
+  })
+
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        phone: user.phone || '',
+      })
+    }
+  }, [user])
 
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
@@ -35,13 +64,97 @@ export default function SettingsPage() {
     { id: 'billing', name: 'Billing', icon: CreditCard },
   ]
 
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: typeof profileData) => {
+      const response = await usersAPI.updateProfile(data)
+      return response.data
+    },
+    onSuccess: (data) => {
+      toast.success('Profile updated successfully!')
+      setUser({ ...user, ...data })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update profile')
+    },
+  })
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: { current_password: string; new_password: string }) => {
+      const response = await usersAPI.changePassword(data.current_password, data.new_password)
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success('Password changed successfully!')
+      setPasswordData({
+        current_password: '',
+        new_password: '',
+        confirm_password: '',
+      })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to change password')
+    },
+  })
+
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (data: typeof preferencesData) => {
+      const response = await settingsAPI.updatePreferences(data)
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success('Preferences updated successfully!')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update preferences')
+    },
+  })
+
   const handleSave = async () => {
-    setIsSaving(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsSaving(false)
-      toast.success('Settings saved successfully!')
-    }, 1000)
+    if (activeTab === 'profile') {
+      updateProfileMutation.mutate(profileData)
+    } else if (activeTab === 'security') {
+      if (!passwordData.current_password || !passwordData.new_password) {
+        toast.error('Please fill in all password fields')
+        return
+      }
+      if (passwordData.new_password !== passwordData.confirm_password) {
+        toast.error('New passwords do not match')
+        return
+      }
+      changePasswordMutation.mutate({
+        current_password: passwordData.current_password,
+        new_password: passwordData.new_password,
+      })
+    } else if (activeTab === 'preferences') {
+      updatePreferencesMutation.mutate(preferencesData)
+    } else {
+      toast.info('This section does not require saving')
+    }
+  }
+
+  const isSaving = updateProfileMutation.isPending ||
+                   changePasswordMutation.isPending ||
+                   updatePreferencesMutation.isPending
+
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfileData({
+      ...profileData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordData({
+      ...passwordData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handlePreferencesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPreferencesData({
+      ...preferencesData,
+      [e.target.name]: e.target.value,
+    })
   }
 
   return (
@@ -96,23 +209,29 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="First Name"
-                      defaultValue={user?.first_name}
+                      name="first_name"
+                      value={profileData.first_name}
+                      onChange={handleProfileChange}
                     />
                     <Input
                       label="Last Name"
-                      defaultValue={user?.last_name}
+                      name="last_name"
+                      value={profileData.last_name}
+                      onChange={handleProfileChange}
                     />
                   </div>
                   <Input
                     label="Email"
                     type="email"
-                    defaultValue={user?.email}
+                    value={user?.email}
                     disabled
                   />
                   <Input
                     label="Phone Number"
+                    name="phone"
                     type="tel"
-                    defaultValue={user?.phone || ''}
+                    value={profileData.phone}
+                    onChange={handleProfileChange}
                     placeholder="+234 XXX XXX XXXX"
                   />
                   <div>
@@ -146,15 +265,24 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                   <Input
                     label="Current Password"
+                    name="current_password"
                     type="password"
+                    value={passwordData.current_password}
+                    onChange={handlePasswordChange}
                   />
                   <Input
                     label="New Password"
+                    name="new_password"
                     type="password"
+                    value={passwordData.new_password}
+                    onChange={handlePasswordChange}
                   />
                   <Input
                     label="Confirm New Password"
+                    name="confirm_password"
                     type="password"
+                    value={passwordData.confirm_password}
+                    onChange={handlePasswordChange}
                   />
                 </CardContent>
               </Card>
@@ -226,7 +354,12 @@ export default function SettingsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Language
                     </label>
-                    <select className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <select
+                      name="language"
+                      value={preferencesData.language}
+                      onChange={handlePreferencesChange}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
                       <option>English</option>
                       <option>Spanish</option>
                       <option>French</option>
@@ -236,7 +369,12 @@ export default function SettingsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Timezone
                     </label>
-                    <select className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <select
+                      name="timezone"
+                      value={preferencesData.timezone}
+                      onChange={handlePreferencesChange}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
                       <option>Africa/Lagos (WAT)</option>
                       <option>Europe/London (GMT)</option>
                       <option>America/New_York (EST)</option>
@@ -246,7 +384,12 @@ export default function SettingsPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Date Format
                     </label>
-                    <select className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <select
+                      name="date_format"
+                      value={preferencesData.date_format}
+                      onChange={handlePreferencesChange}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
                       <option>MM/DD/YYYY</option>
                       <option>DD/MM/YYYY</option>
                       <option>YYYY-MM-DD</option>
