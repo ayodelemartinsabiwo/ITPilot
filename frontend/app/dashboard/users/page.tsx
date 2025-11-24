@@ -20,6 +20,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { EditUserModal } from '@/components/modals/EditUserModal'
+import { InviteUserModal } from '@/components/modals/InviteUserModal'
 import { usersAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
 import { useAuthStore } from '@/lib/store'
@@ -28,6 +30,9 @@ import { toast } from 'sonner'
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
+  const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [userToEdit, setUserToEdit] = useState<any>(null)
   const [userToRemove, setUserToRemove] = useState<any>(null)
   const { user: currentUser } = useAuthStore()
   const queryClient = useQueryClient()
@@ -64,13 +69,12 @@ export default function UsersPage() {
   const users = usersData?.results || []
 
   const handleInviteUser = () => {
-    // TODO: Implement invite modal
-    toast.info('Invite user functionality coming soon')
+    setShowInviteModal(true)
   }
 
   const handleEditUser = (user: any) => {
-    // TODO: Implement edit modal
-    toast.info('Edit user functionality coming soon')
+    setUserToEdit(user)
+    setShowEditModal(true)
   }
 
   const handleRemoveUser = (user: any) => {
@@ -281,6 +285,24 @@ export default function UsersPage() {
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {/* Invite User Modal */}
+      <InviteUserModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+      />
+
+      {/* Edit User Modal */}
+      {userToEdit && (
+        <EditUserModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false)
+            setUserToEdit(null)
+          }}
+          user={userToEdit}
+        />
       )}
 
       {/* Remove User Confirmation Modal */}

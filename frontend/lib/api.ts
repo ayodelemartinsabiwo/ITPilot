@@ -320,4 +320,41 @@ export const billingAPI = {
     api.get('/billing/payment-methods/'),
 }
 
+export const integrationsAPI = {
+  getAll: (params?: { page?: number; search?: string; integration_type?: string }) =>
+    api.get('/integrations/', { params }),
+
+  getById: (id: string) =>
+    api.get(`/integrations/${id}/`),
+
+  create: (data: any) =>
+    api.post('/integrations/', data),
+
+  update: (id: string, data: any) =>
+    api.put(`/integrations/${id}/`, data),
+
+  delete: (id: string) =>
+    api.delete(`/integrations/${id}/`),
+
+  sync: (id: string) =>
+    api.post(`/integrations/${id}/sync/`),
+
+  testConnection: (id: string) =>
+    api.post(`/integrations/${id}/test_connection/`),
+
+  getLogs: (id: string) =>
+    api.get(`/integrations/${id}/logs/`),
+}
+
+export const settingsAPI = {
+  updateProfile: (data: any) =>
+    api.put('/auth/profile/', data),
+
+  updatePreferences: (data: any) =>
+    api.patch('/auth/profile/', data),
+
+  changePassword: (data: { current_password: string; new_password: string }) =>
+    api.post('/auth/change-password/', data),
+}
+
 export default api

@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { AddDeviceModal } from '@/components/modals/AddDeviceModal'
+import { EditDeviceModal } from '@/components/modals/EditDeviceModal'
 import { devicesAPI } from '@/lib/api'
 import { formatRelativeTime } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -26,6 +27,8 @@ export default function DevicesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [deviceToEdit, setDeviceToEdit] = useState<any>(null)
   const [deviceToDelete, setDeviceToDelete] = useState<any>(null)
   const queryClient = useQueryClient()
 
@@ -56,8 +59,8 @@ export default function DevicesPage() {
   const devices = devicesData?.results || []
 
   const handleEditDevice = (device: any) => {
-    // TODO: Implement edit modal
-    toast.info('Edit functionality coming soon')
+    setDeviceToEdit(device)
+    setShowEditModal(true)
   }
 
   const handleDeleteDevice = (device: any) => {
@@ -250,6 +253,18 @@ export default function DevicesPage() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
       />
+
+      {/* Edit Device Modal */}
+      {deviceToEdit && (
+        <EditDeviceModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false)
+            setDeviceToEdit(null)
+          }}
+          device={deviceToEdit}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {deviceToDelete && (

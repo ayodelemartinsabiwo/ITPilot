@@ -1,0 +1,222 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Laptop, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { devicesAPI } from '@/lib/api'
+import { toast } from 'sonner'
+
+interface EditDeviceModalProps {
+  isOpen: boolean
+  onClose: () => void
+  device: any
+}
+
+export function EditDeviceModal({ isOpen, onClose, device }: EditDeviceModalProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    device_type: 'DESKTOP',
+    ip_address: '',
+    mac_address: '',
+    os_type: 'WINDOWS',
+    notes: '',
+  })
+
+  const queryClient = useQueryClient()
+
+  // Initialize form data when device changes
+  useEffect(() => {
+    if (device) {
+      setFormData({
+        name: device.name || '',
+        device_type: device.device_type || device.type || 'DESKTOP',
+        ip_address: device.ip_address || '',
+        mac_address: device.mac_address || '',
+        os_type: device.os_type || device.os || 'WINDOWS',
+        notes: device.notes || '',
+      })
+    }
+  }, [device])
+
+  const updateDeviceMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await devicesAPI.update(device.id, data)
+      return response.data
+    },
+    onSuccess: () => {
+      toast.success('Device updated successfully!')
+      queryClient.invalidateQueries({ queryKey: ['devices'] })
+      onClose()
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update device')
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    updateDeviceMutation.mutate(formData)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          >
+            {/* Modal */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+                    <Laptop className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Edit Device</h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <Input
+                  label="Device Name"
+                  name="name"
+                  placeholder="e.g., Office Laptop #1"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Device Type
+                  </label>
+                  <select
+                    name="device_type"
+                    value={formData.device_type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    required
+                  >
+                    <option value="DESKTOP">Desktop</option>
+                    <option value="LAPTOP">Laptop</option>
+                    <option value="SERVER">Server</option>
+                    <option value="PHONE">Phone</option>
+                    <option value="TABLET">Tablet</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
+                <Input
+                  label="IP Address"
+                  name="ip_address"
+                  placeholder="e.g., 192.168.1.100"
+                  value={formData.ip_address}
+                  onChange={handleChange}
+                />
+
+                <Input
+                  label="MAC Address (Optional)"
+                  name="mac_address"
+                  placeholder="e.g., 00:1B:44:11:3A:B7"
+                  value={formData.mac_address}
+                  onChange={handleChange}
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Operating System
+                  </label>
+                  <select
+                    name="os_type"
+                    value={formData.os_type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    required
+                  >
+                    <option value="WINDOWS">Windows</option>
+                    <option value="MACOS">macOS</option>
+                    <option value="LINUX">Linux</option>
+                    <option value="IOS">iOS</option>
+                    <option value="ANDROID">Android</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (Optional)
+                  </label>
+                  <textarea
+                    name="notes"
+                    placeholder="Additional details about this device..."
+                    value={formData.notes}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onClose}
+                    className="flex-1"
+                    disabled={updateDeviceMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={updateDeviceMutation.isPending}
+                  >
+                    {updateDeviceMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      'Update Device'
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
+}
