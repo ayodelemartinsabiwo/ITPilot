@@ -47,8 +47,6 @@ export default function ChatPage() {
         return []
       }
     },
-    enabled: false, // Disable auto-fetch until backend endpoint is ready
-    initialData: [],
   })
 
   const sendMessageMutation = useMutation({

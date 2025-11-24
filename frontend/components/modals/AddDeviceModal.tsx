@@ -17,11 +17,11 @@ interface AddDeviceModalProps {
 export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
   const [formData, setFormData] = useState({
     name: '',
-    type: 'DESKTOP',
+    device_type: 'DESKTOP',
     ip_address: '',
     mac_address: '',
-    os: '',
-    description: '',
+    os_type: 'WINDOWS',
+    notes: '',
   })
 
   const queryClient = useQueryClient()
@@ -37,11 +37,11 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
       onClose()
       setFormData({
         name: '',
-        type: 'DESKTOP',
+        device_type: 'DESKTOP',
         ip_address: '',
         mac_address: '',
-        os: '',
-        description: '',
+        os_type: 'WINDOWS',
+        notes: '',
       })
     },
     onError: (error: any) => {
@@ -114,8 +114,8 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
                     Device Type
                   </label>
                   <select
-                    name="type"
-                    value={formData.type}
+                    name="device_type"
+                    value={formData.device_type}
                     onChange={handleChange}
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
                     required
@@ -123,7 +123,7 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
                     <option value="DESKTOP">Desktop</option>
                     <option value="LAPTOP">Laptop</option>
                     <option value="SERVER">Server</option>
-                    <option value="MOBILE">Mobile Device</option>
+                    <option value="PHONE">Phone</option>
                     <option value="TABLET">Tablet</option>
                     <option value="OTHER">Other</option>
                   </select>
@@ -145,22 +145,34 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
                   onChange={handleChange}
                 />
 
-                <Input
-                  label="Operating System"
-                  name="os"
-                  placeholder="e.g., Windows 11, macOS, Ubuntu"
-                  value={formData.os}
-                  onChange={handleChange}
-                />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Operating System
+                  </label>
+                  <select
+                    name="os_type"
+                    value={formData.os_type}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    required
+                  >
+                    <option value="WINDOWS">Windows</option>
+                    <option value="MACOS">macOS</option>
+                    <option value="LINUX">Linux</option>
+                    <option value="IOS">iOS</option>
+                    <option value="ANDROID">Android</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description (Optional)
+                    Notes (Optional)
                   </label>
                   <textarea
-                    name="description"
+                    name="notes"
                     placeholder="Additional details about this device..."
-                    value={formData.description}
+                    value={formData.notes}
                     onChange={handleChange}
                     rows={3}
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"

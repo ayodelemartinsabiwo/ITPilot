@@ -244,48 +244,60 @@ export const ticketsAPI = {
 }
 
 export const chatAPI = {
-  sendMessage: (message: string, conversationId?: string) =>
-    api.post('/chat/messages/', { message, conversation_id: conversationId }),
+  sendMessage: (message: string, sessionId?: string) =>
+    api.post('/ai/messages/', { message, session_id: sessionId }),
 
   getConversations: () =>
-    api.get('/chat/conversations/'),
+    api.get('/ai/sessions/'),
 
   getConversationById: (id: string) =>
-    api.get(`/chat/conversations/${id}/`),
+    api.get(`/ai/sessions/${id}/`),
 
   deleteConversation: (id: string) =>
-    api.delete(`/chat/conversations/${id}/`),
+    api.delete(`/ai/sessions/${id}/`),
+
+  getSessions: () =>
+    api.get('/ai/sessions/'),
+
+  getMessages: (sessionId: string) =>
+    api.get(`/ai/messages/?session_id=${sessionId}`),
 }
 
 export const dashboardAPI = {
   getStats: () =>
-    api.get('/dashboard/stats/'),
+    api.get('/auth/dashboard/'),
 
   getRecentActivity: () =>
-    api.get('/dashboard/activity/'),
+    api.get('/auth/dashboard/'),
 
   getChartData: (type: 'tickets' | 'devices' | 'performance', period: '7d' | '30d' | '90d') =>
-    api.get('/dashboard/charts/', { params: { type, period } }),
+    api.get('/auth/dashboard/', { params: { type, period } }),
 }
 
 export const usersAPI = {
   getAll: (params?: { page?: number; search?: string; role?: string }) =>
-    api.get('/users/', { params }),
+    api.get('/organizations/members/', { params }),
 
   getById: (id: string) =>
-    api.get(`/users/${id}/`),
+    api.get(`/organizations/members/${id}/`),
 
   update: (id: string, data: any) =>
-    api.put(`/users/${id}/`, data),
+    api.put(`/organizations/members/${id}/`, data),
 
   updateProfile: (data: any) =>
-    api.put('/users/profile/', data),
+    api.put('/auth/profile/', data),
 
   changePassword: (currentPassword: string, newPassword: string) =>
-    api.post('/users/change-password/', {
+    api.post('/auth/change-password/', {
       current_password: currentPassword,
       new_password: newPassword
     }),
+
+  inviteUser: (data: { email: string; role: string; organization?: string }) =>
+    api.post('/organizations/members/', data),
+
+  removeUser: (id: string) =>
+    api.delete(`/organizations/members/${id}/`),
 }
 
 export const billingAPI = {
