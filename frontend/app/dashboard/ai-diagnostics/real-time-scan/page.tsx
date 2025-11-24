@@ -254,20 +254,20 @@ export default function RealTimeScanPage() {
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition"
                 >
                   <div className="flex items-center space-x-4">
-                    {scan.status === 'completed' ? (
+                    {scan.status === 'COMPLETED' ? (
                       <CheckCircle className="w-8 h-8 text-green-500" />
-                    ) : scan.status === 'running' ? (
+                    ) : scan.status === 'RUNNING' ? (
                       <Activity className="w-8 h-8 text-orange-500 animate-pulse" />
                     ) : (
                       <XCircle className="w-8 h-8 text-red-500" />
                     )}
                     <div>
-                      <h3 className="font-semibold text-gray-900">{scan.name}</h3>
-                      <p className="text-sm text-gray-600">{scan.timestamp}</p>
+                      <h3 className="font-semibold text-gray-900">{scan.device_name} - {scan.scan_type}</h3>
+                      <p className="text-sm text-gray-600">{new Date(scan.created_at).toLocaleString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <Badge variant={scan.status === 'completed' ? 'success' : 'warning'}>
+                    <Badge variant={scan.status === 'COMPLETED' ? 'success' : 'warning'}>
                       {scan.status}
                     </Badge>
                     <Button size="sm" variant="outline">View Report</Button>

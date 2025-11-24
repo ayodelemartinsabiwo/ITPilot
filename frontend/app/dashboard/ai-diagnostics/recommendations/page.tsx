@@ -206,8 +206,8 @@ export default function RecommendationsPage() {
                       <div className="flex items-center gap-3 mb-3">
                         {getCategoryIcon(rec.category)}
                         <h3 className="font-semibold text-lg text-gray-900">{rec.title}</h3>
-                        <Badge variant={rec.priority === 'high' ? 'danger' : rec.priority === 'medium' ? 'warning' : 'info'}>
-                          {rec.priority.toUpperCase()} PRIORITY
+                        <Badge variant={rec.priority === 'HIGH' ? 'danger' : rec.priority === 'MEDIUM' ? 'warning' : 'info'}>
+                          {rec.priority} PRIORITY
                         </Badge>
                         <Badge variant="outline">{rec.category}</Badge>
                       </div>
@@ -226,10 +226,10 @@ export default function RecommendationsPage() {
                           <p className="font-semibold text-green-600">{rec.estimatedBenefit}</p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">Generated: {rec.createdAt}</p>
+                      <p className="text-xs text-gray-500">Generated: {new Date(rec.created_at).toLocaleString()}</p>
                     </div>
                     <div className="flex flex-col gap-2 ml-4">
-                      {rec.status === 'pending' && (
+                      {rec.status === 'ACTIVE' && (
                         <>
                           <Button size="sm" variant="success">
                             <CheckCircle className="w-4 h-4 mr-2" />
