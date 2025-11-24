@@ -290,33 +290,33 @@ export default function AlertsPage() {
               {alerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className={`p-4 border-l-4 rounded-lg ${getAlertColor(alert.severity)}`}
+                  className={`p-4 border-l-4 rounded-lg ${getAlertColor(alert.type)}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
-                      {getAlertIcon(alert.severity)}
+                      {getAlertIcon(alert.type)}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">{alert.title}</h3>
-                          <Badge variant={alert.severity === 'CRITICAL' ? 'danger' : alert.severity === 'WARNING' ? 'warning' : alert.severity === 'INFO' ? 'info' : 'success'}>
-                            {alert.severity}
+                          <Badge variant={alert.type === 'critical' ? 'danger' : alert.type === 'warning' ? 'warning' : alert.type === 'info' ? 'info' : 'success'}>
+                            {alert.type.toUpperCase()}
                           </Badge>
-                          <Badge variant={alert.status === 'ACTIVE' ? 'danger' : alert.status === 'ACKNOWLEDGED' ? 'warning' : 'success'}>
-                            {alert.status}
+                          <Badge variant={alert.status === 'active' ? 'danger' : alert.status === 'acknowledged' ? 'warning' : 'success'}>
+                            {alert.status.toUpperCase()}
                           </Badge>
-                          {alert.severity === 'CRITICAL' && (
+                          {alert.actionRequired && (
                             <Badge variant="danger">Action Required</Badge>
                           )}
                         </div>
                         <p className="text-sm text-gray-700 mb-2">{alert.message}</p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
-                          <span>Device: {alert.device_name || 'System'}</span>
-                          <span>Time: {new Date(alert.created_at).toLocaleString()}</span>
+                          <span>Source: {alert.source}</span>
+                          <span>Time: {alert.timestamp}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
-                      {alert.status === 'ACTIVE' && (
+                      {alert.status === 'active' && (
                         <>
                           <Button size="sm" variant="outline" onClick={() => acknowledgeAlert(alert.id)}>
                             Acknowledge
@@ -327,7 +327,7 @@ export default function AlertsPage() {
                           </Button>
                         </>
                       )}
-                      {alert.status === 'ACKNOWLEDGED' && (
+                      {alert.status === 'acknowledged' && (
                         <Button size="sm" variant="success" onClick={() => resolveAlert(alert.id)}>
                           <CheckCircle className="w-4 h-4 mr-1" />
                           Resolve

@@ -249,25 +249,25 @@ export default function IssuesPage() {
                       <div className="flex items-center gap-3 mb-2">
                         {getSeverityIcon(issue.severity)}
                         <h3 className="font-semibold text-gray-900">{issue.title}</h3>
-                        <Badge variant={issue.severity === 'CRITICAL' ? 'danger' : issue.severity === 'HIGH' ? 'warning' : 'default'}>
-                          {issue.severity}
+                        <Badge variant={issue.severity === 'critical' ? 'danger' : issue.severity === 'high' ? 'warning' : 'default'}>
+                          {issue.severity.toUpperCase()}
                         </Badge>
                         <Badge variant="outline">{issue.category}</Badge>
-                        {issue.auto_fixable && (
+                        {issue.autoFixable && (
                           <Badge variant="success">Auto-Fixable</Badge>
                         )}
-                        <Badge variant={issue.status === 'RESOLVED' ? 'success' : issue.status === 'IN_PROGRESS' ? 'warning' : 'danger'}>
-                          {issue.status.replace('_', ' ')}
+                        <Badge variant={issue.status === 'resolved' ? 'success' : issue.status === 'in_progress' ? 'warning' : 'danger'}>
+                          {issue.status.replace('_', ' ').toUpperCase()}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-700 mb-2">{issue.description}</p>
                       <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span>Device: {issue.device_name}</span>
-                        <span>Detected: {new Date(issue.detected_at).toLocaleString()}</span>
+                        <span>Device: {issue.device}</span>
+                        <span>Detected: {issue.detectedAt}</span>
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
-                      {issue.auto_fixable && issue.status !== 'RESOLVED' && (
+                      {issue.autoFixable && issue.status !== 'resolved' && (
                         <Button size="sm" variant="success">
                           Auto-Fix
                         </Button>
