@@ -1578,6 +1578,311 @@ Technician → Support → Notifications → User
 
 ---
 
+## 14. Implementation Phases
+
+### Overview
+This section outlines the comprehensive implementation roadmap for ITPilot, broken down into 5 major phases with clear priorities and timelines.
+
+---
+
+### PHASE 1: Clean Up & Consolidation 🧹
+**Priority:** HIGH | **Timeline:** Foundation | **Status:** ✅ COMPLETED
+
+#### 1.1 Resolve Duplicate Pages
+**Issue:** Two "Connected Devices" pages exist:
+- `/dashboard/devices` (✅ fully functional)
+- `/dashboard/device-management/devices` (⚠️ placeholder only)
+
+**Actions Taken:**
+- ✅ Removed duplicate placeholder page
+- ✅ Updated sidebar navigation to point to `/dashboard/devices`
+- ✅ Differentiated: `/devices` = main overview, device management subsections for detailed views
+
+#### 1.2 Standardize Component Usage
+**Actions Taken:**
+- ✅ Ensured all buttons use consistent variants (primary/secondary/danger)
+- ✅ Standardized modal implementations across all "Add" buttons
+- ✅ Consolidated API call patterns using service layer
+
+---
+
+### PHASE 2: Connect Existing UI to Backend 🔌
+**Priority:** HIGH | **Timeline:** Core Features | **Status:** 🚧 IN PROGRESS
+
+#### 2.1 Support & Ticketing (Backend EXISTS ✅)
+**Files to Update:**
+- `/app/dashboard/support/tickets/page.tsx`
+- `/app/dashboard/support/queue/page.tsx`
+
+**Tasks:**
+- [ ] Integrate CreateTicketModal with "New Ticket" button
+- [ ] Connect to `/api/v1/tickets/` endpoint
+- [ ] Implement ticket list with filtering (status, priority, category)
+- [ ] Add ticket detail view with messages
+- [ ] Implement ticket assignment functionality
+- [ ] Add SLA indicators and breach warnings
+- [ ] Connect technician queue to assigned tickets
+
+#### 2.2 Device Management Pages
+**Files to Update:**
+- `/app/dashboard/device-management/health/page.tsx`
+- `/app/dashboard/device-management/performance/page.tsx`
+- `/app/dashboard/device-management/security/page.tsx`
+- `/app/dashboard/device-management/compliance/page.tsx`
+
+**Tasks:**
+- [ ] Connect to `/api/v1/devices/{id}/health_history/` endpoint
+- [ ] Display real-time health metrics (CPU, RAM, disk, battery)
+- [ ] Implement health threshold alerts
+- [ ] Add performance charts using device metrics API
+- [ ] Create security status dashboard (encryption, compliance flags)
+- [ ] Build compliance checker using device metadata
+
+#### 2.3 Organization & Admin (Backend EXISTS ✅)
+**Files to Update:**
+- `/app/dashboard/admin/users/page.tsx`
+- `/app/dashboard/admin/roles/page.tsx`
+- `/app/dashboard/admin/activity-logs/page.tsx`
+- `/app/dashboard/admin/settings/page.tsx`
+
+**Tasks:**
+- [ ] Connect to `/api/v1/organizations/` endpoints
+- [ ] Implement "Add User" button with modal
+- [ ] Build role/permission editor
+- [ ] Connect activity logs to audit trail
+- [ ] Create organization settings form
+
+#### 2.4 Billing & Subscriptions (Backend EXISTS ✅)
+**Files to Update:**
+- `/app/dashboard/billing/plans/page.tsx`
+- `/app/dashboard/billing/payments/page.tsx`
+
+**Tasks:**
+- [ ] Connect to `/api/v1/billing/` endpoints
+- [ ] Display current plan and usage limits
+- [ ] Show payment history
+- [ ] Implement plan upgrade/downgrade buttons
+
+---
+
+### PHASE 3: Build Missing Backend Services 🏗️
+**Priority:** MEDIUM-HIGH | **Timeline:** Extended Features | **Status:** 📋 PENDING
+
+#### 3.1 AI Diagnostics System
+**New Backend Module:** `backend/ai_diagnostics/`
+
+**Models Needed:**
+- `DiagnosticScan` (device, scan_type, status, started_at, completed_at)
+- `DetectedIssue` (scan, severity, category, description, auto_fix_available)
+- `Recommendation` (issue, action_type, implementation_steps)
+- `AutoFixAction` (issue, action_taken, success, result)
+
+**API Endpoints:**
+```
+POST   /api/v1/ai-diagnostics/scans/                # Start scan
+GET    /api/v1/ai-diagnostics/scans/{id}/           # Scan status
+GET    /api/v1/ai-diagnostics/issues/               # List issues
+POST   /api/v1/ai-diagnostics/issues/{id}/auto-fix/ # Trigger auto-fix
+GET    /api/v1/ai-diagnostics/recommendations/      # Get recommendations
+```
+
+**Frontend Pages:**
+- `/app/dashboard/ai-diagnostics/real-time-scan/page.tsx` - "Start Scan" button
+- `/app/dashboard/ai-diagnostics/issues/page.tsx` - Issue list
+- `/app/dashboard/ai-diagnostics/recommendations/page.tsx` - Recommendations
+- `/app/dashboard/ai-diagnostics/auto-fix/page.tsx` - Auto-fix actions
+
+#### 3.2 Network & Security Monitoring
+**New Backend Module:** `backend/network_security/`
+
+**Models Needed:**
+- `WiFiNetwork` (device, ssid, signal_strength, security_type, is_secure)
+- `ThreatAlert` (device, threat_type, severity, detected_at, resolved)
+- `PatchStatus` (device, patch_type, installed, pending_count, last_check)
+- `AntivirusStatus` (device, av_software, is_active, last_scan, threats_found)
+- `PasswordCheck` (device, strength_score, weak_passwords_count)
+
+**API Endpoints:**
+```
+GET    /api/v1/network-security/wifi/               # WiFi analysis
+GET    /api/v1/network-security/threats/            # Threat alerts
+GET    /api/v1/network-security/patches/            # Patch status
+GET    /api/v1/network-security/antivirus/          # AV health
+POST   /api/v1/network-security/password-check/     # Check passwords
+```
+
+**Frontend Pages:**
+- `/app/dashboard/network-security/wifi-analysis/page.tsx` - "Scan Networks" button
+- `/app/dashboard/network-security/threats/page.tsx` - Alert list
+- `/app/dashboard/network-security/patches/page.tsx` - Patch management
+- `/app/dashboard/network-security/antivirus/page.tsx` - AV monitoring
+
+#### 3.3 Cloud Integrations
+**New Backend Module:** `backend/integrations/` (expand existing)
+
+**Models Needed:**
+- `CloudConnection` (organization, service_type, credentials, is_active)
+- `LicenseUsage` (connection, license_type, total, assigned, available)
+- `ServiceHealth` (connection, status, last_check, incidents)
+- `SyncError` (connection, error_type, description, resolved)
+
+**API Endpoints:**
+```
+POST   /api/v1/integrations/connect/                # Connect service
+GET    /api/v1/integrations/licenses/               # License usage
+GET    /api/v1/integrations/health/                 # Service health
+GET    /api/v1/integrations/sync-errors/            # Sync issues
+```
+
+**Frontend Pages:**
+- `/app/dashboard/cloud-integrations/microsoft-365/page.tsx` - "Connect Microsoft 365" button
+- `/app/dashboard/cloud-integrations/google-workspace/page.tsx` - "Connect Google Workspace" button
+- `/app/dashboard/cloud-integrations/licenses/page.tsx` - License management
+- `/app/dashboard/cloud-integrations/service-health/page.tsx` - Service monitoring
+
+---
+
+### PHASE 4: Real-Time Features ⚡
+**Priority:** MEDIUM | **Timeline:** Enhanced Experience | **Status:** 📋 PENDING
+
+#### 4.1 WebSocket Implementation
+**Backend:**
+- Add Django Channels or use Django REST Framework with Server-Sent Events
+- Create WebSocket consumers for:
+  - Device status updates
+  - Health metric streaming
+  - New ticket notifications
+  - Security alerts
+
+**Frontend:**
+- Create WebSocket context provider
+- Add real-time indicators to device cards
+- Implement live chart updates
+- Add notification badge updates
+
+#### 4.2 Background Task Processing
+**Backend:**
+- Set up Celery with Redis
+- Create periodic tasks:
+  - Device health checks (every 5 minutes)
+  - SLA breach monitoring (every 1 minute)
+  - Diagnostic scans (scheduled)
+  - Report generation
+
+---
+
+### PHASE 5: Deployment Readiness 🚀
+**Priority:** HIGH | **Timeline:** Pre-Launch | **Status:** 📋 PENDING
+
+#### 5.1 Environment Configuration
+**Files to Create/Update:**
+
+**Backend:**
+- `backend/.env.production`
+- `backend/core/settings/production.py`
+- `backend/gunicorn.conf.py`
+- `backend/Dockerfile`
+- `docker-compose.production.yml`
+
+**Frontend:**
+- `frontend/.env.production`
+- `frontend/next.config.js` (production optimizations)
+- `frontend/Dockerfile`
+- `nginx.conf`
+
+#### 5.2 Database & Migrations
+- [ ] Run all migrations on production database
+- [ ] Set up database backups (daily)
+- [ ] Configure read replicas if needed
+- [ ] Add database indexes for performance
+
+#### 5.3 Security Hardening
+- [ ] Enable HTTPS/SSL certificates
+- [ ] Configure CORS properly
+- [ ] Set up rate limiting (Django throttling)
+- [ ] Enable CSRF protection
+- [ ] Configure secure session cookies
+- [ ] Add API key rotation mechanism
+- [ ] Set up secrets management (AWS Secrets Manager / HashiCorp Vault)
+
+#### 5.4 Monitoring & Logging
+- [ ] Set up Sentry for error tracking
+- [ ] Configure application logging (CloudWatch / ELK Stack)
+- [ ] Add performance monitoring (New Relic / DataDog)
+- [ ] Create health check endpoints
+- [ ] Set up uptime monitoring
+
+#### 5.5 CI/CD Pipeline
+**Files to Create:**
+- `.github/workflows/backend-ci.yml`
+- `.github/workflows/frontend-ci.yml`
+- `.github/workflows/deploy-staging.yml`
+- `.github/workflows/deploy-production.yml`
+
+**Pipeline Steps:**
+1. Run tests (backend: pytest, frontend: jest)
+2. Code quality checks (ESLint, Pylint, Black)
+3. Build Docker images
+4. Push to container registry
+5. Deploy to staging
+6. Run E2E tests
+7. Deploy to production (manual approval)
+
+#### 5.6 Documentation
+- [ ] API documentation (Swagger/OpenAPI)
+- [ ] Deployment guide
+- [ ] Environment variables reference
+- [ ] Database schema documentation
+- [ ] User manual for dashboard features
+
+---
+
+### PRIORITY MATRIX
+
+#### 🔴 CRITICAL (Do First)
+- ✅ Phase 1: Clean up duplicates
+- 🚧 Phase 2.1: Support & Ticketing integration
+- 🚧 Phase 2.2: Device health/performance pages
+- Phase 5.3: Security hardening
+- Phase 5.1: Production environment setup
+
+#### 🟡 HIGH (Do Soon)
+- Phase 2.3: Admin & user management
+- Phase 3.1: AI Diagnostics backend
+- Phase 3.2: Network & Security backend
+- Phase 5.5: CI/CD pipeline
+- Phase 5.4: Monitoring & logging
+
+#### 🟢 MEDIUM (Nice to Have)
+- Phase 2.4: Billing integration
+- Phase 3.3: Cloud integrations
+- Phase 4.1: WebSocket real-time updates
+- Phase 4.2: Background task processing
+
+---
+
+### ESTIMATED SCOPE
+
+**Button/Input Elements Requiring Implementation:**
+- 35+ placeholder pages with non-functional buttons
+- ~50-70 action buttons (Add Device, New Ticket, Start Scan, etc.)
+- ~20-30 forms (modals and full-page forms)
+- ~15 filter/search inputs across various pages
+
+**Backend APIs to Build:**
+- 3 new modules (AI Diagnostics, Network Security, expanded Integrations)
+- ~30-40 new API endpoints
+- ~15-20 new database models
+- ~25-30 serializers
+
+**DevOps Configuration:**
+- 6 Dockerfiles/configs
+- 4 CI/CD workflows
+- 5 environment configurations
+- Security & monitoring setup
+
+---
+
 ## Document Control
 
 **Version History:**
@@ -1587,6 +1892,7 @@ Technician → Support → Notifications → User
 | 1.0 | 2025-01-15 | ITPilot Team | Initial SRS document |
 | 2.0 | 2025-11-22 | ITPilot Team | Added Product Purpose, Implementation Strategy, Dashboard Structure |
 | 2.1 | 2025-11-22 | ITPilot Team | Added comprehensive UX Workflow Diagram (Section 12) |
+| 2.2 | 2025-11-24 | ITPilot Team | Added comprehensive Implementation Phases (Section 14) |
 
 **Approval:**
 
