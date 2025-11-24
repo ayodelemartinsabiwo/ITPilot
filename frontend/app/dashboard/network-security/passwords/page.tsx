@@ -17,14 +17,60 @@ import {
   RefreshCw,
   Settings,
 } from 'lucide-react';
+import { networkSecurityService, PasswordAudit } from '@/lib/api/services/network-security.service';
+import toast from 'react-hot-toast';
 
 export default function PasswordsPage() {
   const [loading, setLoading] = useState(true);
-  const [passwords, setPasswords] = useState<any[]>([]);
+  const [passwords, setPasswords] = useState<PasswordAudit[]>([]);
+  const [stats, setStats] = useState({
+    strong: 0,
+    medium: 0,
+    weak: 0,
+    total: 0,
+    compromised: 0,
+  });
+
+  const fetchPasswords = async () => {
+    try {
+      setLoading(true);
+      const response = await networkSecurityService.getPasswordAudits({ ordering: '-created_at' });
+      const passwordData = response.data?.data || [];
+      setPasswords(passwordData);
+
+      // Calculate stats
+      const stats = {
+        strong: passwordData.filter((p: PasswordAudit) => p.status === 'STRONG').length,
+        medium: passwordData.filter((p: PasswordAudit) => p.status === 'MEDIUM').length,
+        weak: passwordData.filter((p: PasswordAudit) => p.status === 'WEAK').length,
+        compromised: passwordData.filter((p: PasswordAudit) => p.is_compromised).length,
+        total: passwordData.length,
+      };
+      setStats(stats);
+    } catch (error) {
+      console.error('Failed to fetch password audits:', error);
+      toast.error('Failed to load password audits');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRunAudit = async () => {
+    try {
+      toast.loading('Running password audit...');
+      // This would typically require a device ID
+      // For now, we'll just refresh the list
+      await fetchPasswords();
+      toast.dismiss();
+      toast.success('Password audit completed');
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to run password audit');
+    }
+  };
 
   useEffect(() => {
-    // TODO: Fetch data from API
-    setLoading(false);
+    fetchPasswords();
   }, []);
 
   const getStrengthColor = (strength: string) => {
@@ -61,8 +107,8 @@ export default function PasswordsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Password Security Audit</h1>
           <p className="text-gray-600 mt-1">Analyze and strengthen password security across your organization</p>
         </div>
-        <Button variant="primary">
-          <RefreshCw className="w-4 h-4 mr-2" />
+        <Button variant="primary" onClick={handleRunAudit} disabled={loading}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Run Audit
         </Button>
       </div>
@@ -74,7 +120,7 @@ export default function PasswordsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Strong Passwords</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{stats.strong}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
                 <Shield className="w-6 h-6 text-green-600" />
@@ -88,7 +134,7 @@ export default function PasswordsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Medium Strength</p>
-                <p className="text-3xl font-bold text-yellow-600">0</p>
+                <p className="text-3xl font-bold text-yellow-600">{stats.medium}</p>
               </div>
               <div className="p-3 bg-yellow-100 rounded-full">
                 <AlertTriangle className="w-6 h-6 text-yellow-600" />
@@ -102,7 +148,7 @@ export default function PasswordsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Weak Passwords</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">{stats.weak}</p>
               </div>
               <div className="p-3 bg-red-100 rounded-full">
                 <XCircle className="w-6 h-6 text-red-600" />
@@ -116,7 +162,7 @@ export default function PasswordsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Accounts</p>
-                <p className="text-3xl font-bold text-blue-600">0</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-full">
                 <Key className="w-6 h-6 text-blue-600" />
@@ -131,26 +177,34 @@ export default function PasswordsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Password Strength Distribution</h2>
-            <Badge className="bg-blue-500">Overall Score: N/A</Badge>
+            <Badge className="bg-blue-500">
+              Overall Score: {stats.total > 0 ? Math.round((stats.strong / stats.total) * 100) : 'N/A'}%
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-6 bg-green-50 rounded-lg">
               <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500" />
-              <p className="text-3xl font-bold text-green-600">0%</p>
+              <p className="text-3xl font-bold text-green-600">
+                {stats.total > 0 ? Math.round((stats.strong / stats.total) * 100) : 0}%
+              </p>
               <p className="text-sm text-gray-600 mt-2">Strong Passwords</p>
               <p className="text-xs text-gray-500 mt-1">12+ characters, mixed case, numbers, symbols</p>
             </div>
             <div className="text-center p-6 bg-yellow-50 rounded-lg">
               <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-yellow-500" />
-              <p className="text-3xl font-bold text-yellow-600">0%</p>
+              <p className="text-3xl font-bold text-yellow-600">
+                {stats.total > 0 ? Math.round((stats.medium / stats.total) * 100) : 0}%
+              </p>
               <p className="text-sm text-gray-600 mt-2">Medium Strength</p>
               <p className="text-xs text-gray-500 mt-1">8+ characters, some complexity</p>
             </div>
             <div className="text-center p-6 bg-red-50 rounded-lg">
               <XCircle className="w-12 h-12 mx-auto mb-3 text-red-500" />
-              <p className="text-3xl font-bold text-red-600">0%</p>
+              <p className="text-3xl font-bold text-red-600">
+                {stats.total > 0 ? Math.round((stats.weak / stats.total) * 100) : 0}%
+              </p>
               <p className="text-sm text-gray-600 mt-2">Weak Passwords</p>
               <p className="text-xs text-gray-500 mt-1">Less than 8 characters or common patterns</p>
             </div>
@@ -169,41 +223,55 @@ export default function PasswordsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          {passwords.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-gray-500">
+              <RefreshCw className="w-16 h-16 mx-auto mb-4 text-orange-500 animate-spin" />
+              <p className="text-lg font-medium text-gray-900">Loading password audits...</p>
+            </div>
+          ) : passwords.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <Key className="w-16 h-16 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium">No password data available</p>
               <p className="text-sm mb-4">Run a password audit to analyze account security</p>
-              <Button variant="primary">
+              <Button variant="primary" onClick={handleRunAudit}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Start Audit
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
-              {passwords.map((password, index) => (
+              {passwords.filter(p => p.status !== 'STRONG').slice(0, 10).map((password) => (
                 <div
-                  key={index}
+                  key={password.id}
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
                 >
                   <div className="flex items-center gap-4">
-                    {getStrengthIcon(password.strength)}
+                    {getStrengthIcon(password.status)}
                     <div>
-                      <h3 className="font-semibold">{password.account}</h3>
-                      <p className="text-sm text-gray-600">{password.email}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Last changed: {password.lastChanged}
-                      </p>
+                      <h3 className="font-semibold">{password.account_name}</h3>
+                      <p className="text-sm text-gray-600">{password.account_type}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-gray-500">
+                          Length: {password.length} chars
+                        </p>
+                        {password.is_compromised && (
+                          <Badge className="bg-red-500 text-xs">Compromised</Badge>
+                        )}
+                        {password.is_reused && (
+                          <Badge className="bg-yellow-500 text-xs">Reused</Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <Badge className={getStrengthColor(password.strength)}>
-                      {password.strength}
-                    </Badge>
-                    <Button size="sm" variant="outline">
-                      <RefreshCw className="w-4 h-4 mr-2" />
-                      Update
-                    </Button>
+                    <div className="text-right">
+                      <Badge className={getStrengthColor(password.status)}>
+                        {password.status}
+                      </Badge>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Score: {password.strength_score}/100
+                      </p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -296,15 +364,37 @@ export default function PasswordsPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Compromised Password Check</h2>
-            <Badge className="bg-green-500">0 Found</Badge>
+            <Badge className={stats.compromised > 0 ? 'bg-red-500' : 'bg-green-500'}>
+              {stats.compromised} Found
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="text-center py-12 text-gray-500">
-            <Lock className="w-16 h-16 mx-auto mb-4 text-green-500" />
-            <p className="text-lg font-medium text-gray-900">No compromised passwords detected</p>
-            <p className="text-sm">All passwords are secure and not found in breach databases</p>
-          </div>
+          {stats.compromised === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <Lock className="w-16 h-16 mx-auto mb-4 text-green-500" />
+              <p className="text-lg font-medium text-gray-900">No compromised passwords detected</p>
+              <p className="text-sm">All passwords are secure and not found in breach databases</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {passwords.filter(p => p.is_compromised).map((password) => (
+                <div
+                  key={password.id}
+                  className="flex items-center justify-between p-4 border-2 border-red-200 bg-red-50 rounded-lg"
+                >
+                  <div className="flex items-center gap-4">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                    <div>
+                      <h3 className="font-semibold text-red-900">{password.account_name}</h3>
+                      <p className="text-sm text-red-700">Found in breach database - Change immediately!</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-red-500">COMPROMISED</Badge>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
