@@ -35,7 +35,7 @@ export default function PasswordsPage() {
     try {
       setLoading(true);
       const response = await networkSecurityService.getPasswordAudits({ ordering: '-created_at' });
-      const passwordData = response.data?.data || [];
+      const passwordData = response.data || [];
       setPasswords(passwordData);
 
       // Calculate stats

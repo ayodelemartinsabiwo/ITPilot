@@ -33,7 +33,7 @@ export default function PatchesPage() {
     try {
       setLoading(true);
       const response = await networkSecurityService.getPatches({ ordering: '-created_at' });
-      const patchData = response.data?.data || [];
+      const patchData = response.data || [];
       setPatches(patchData);
 
       // Calculate stats
