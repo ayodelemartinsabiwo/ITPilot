@@ -34,7 +34,7 @@ export default function AntivirusPage() {
     try {
       setLoading(true);
       const response = await networkSecurityService.getAntivirusStatuses({ ordering: '-updated_at' });
-      const deviceData = response.data?.data || [];
+      const deviceData = response.data || [];
       setDevices(deviceData);
 
       // Calculate stats

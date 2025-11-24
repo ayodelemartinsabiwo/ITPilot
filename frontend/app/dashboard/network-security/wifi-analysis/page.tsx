@@ -31,7 +31,7 @@ export default function WiFiAnalysisPage() {
     try {
       setLoading(true);
       const response = await networkSecurityService.getWiFiNetworks({ ordering: '-signal_strength' });
-      const networkData = response.data?.data || [];
+      const networkData = response.data || [];
       setNetworks(networkData);
 
       // Calculate stats
