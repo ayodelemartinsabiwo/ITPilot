@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -21,15 +21,65 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import { adminService, Organization } from '@/lib/api/services/admin.service';
 
 export default function OrganizationSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [organization, setOrganization] = useState<Organization | null>(null);
+
+  useEffect(() => {
+    fetchOrganization();
+  }, []);
+
+  const fetchOrganization = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await adminService.getOrganization();
+      if (response.data) {
+        setOrganization(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching organization:', err);
+      setError(err.message || 'Failed to load organization settings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
     // Simulate save operation
     setTimeout(() => setIsSaving(false), 1000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading organization settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !organization) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center text-red-500">
+          <XCircle className="w-16 h-16 mx-auto mb-4" />
+          <p className="text-lg font-medium">Error loading organization settings</p>
+          <p className="text-sm mt-2">{error || 'Organization data not found'}</p>
+          <Button variant="primary" className="mt-4" onClick={fetchOrganization}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -67,8 +117,8 @@ export default function OrganizationSettingsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-sm text-gray-600">Active Members</p>
+                <p className="text-3xl font-bold text-gray-900">{organization.members_count}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -79,8 +129,8 @@ export default function OrganizationSettingsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Security Level</p>
-                <p className="text-lg font-bold text-orange-600">High</p>
+                <p className="text-sm text-gray-600">Subscription Plan</p>
+                <p className="text-lg font-bold text-orange-600 capitalize">{organization.subscription_plan.replace('_', ' ')}</p>
               </div>
               <Shield className="w-8 h-8 text-orange-500" />
             </div>
@@ -91,8 +141,8 @@ export default function OrganizationSettingsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Data Storage</p>
-                <p className="text-lg font-bold text-purple-600">Cloud</p>
+                <p className="text-sm text-gray-600">Devices</p>
+                <p className="text-3xl font-bold text-purple-600">{organization.devices_count}</p>
               </div>
               <Database className="w-8 h-8 text-purple-500" />
             </div>
@@ -116,6 +166,7 @@ export default function OrganizationSettingsPage() {
               </label>
               <input
                 type="text"
+                defaultValue={organization.name}
                 placeholder="Enter organization name"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
@@ -123,43 +174,36 @@ export default function OrganizationSettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Email
+                  Domain
                 </label>
                 <input
-                  type="email"
-                  placeholder="contact@organization.com"
+                  type="text"
+                  defaultValue={organization.domain}
+                  placeholder="organization.com"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  Created At
                 </label>
                 <input
-                  type="tel"
-                  placeholder="+1 (555) 123-4567"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  type="text"
+                  value={new Date(organization.created_at).toLocaleDateString()}
+                  disabled
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Website
+                Organization ID
               </label>
               <input
-                type="url"
-                placeholder="https://organization.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address
-              </label>
-              <textarea
-                rows={3}
-                placeholder="Enter organization address"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                type="text"
+                value={organization.id}
+                disabled
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
               />
             </div>
           </div>

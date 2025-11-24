@@ -1,26 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Ticket, Plus, Search, Filter, Clock, CheckCircle, AlertCircle, XCircle, User, Calendar } from 'lucide-react';
-
-interface SupportTicket {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in-progress' | 'resolved' | 'closed';
-  assignee: string;
-  createdAt: string;
-  category: string;
-}
+import { ticketsService, Ticket as ServiceTicket } from '@/lib/api/services/tickets.service';
 
 export default function SupportTicketsPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [tickets, setTickets] = useState<ServiceTicket[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const fetchTickets = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await ticketsService.getTickets();
+      if (response.data) {
+        setTickets(response.data);
+      }
+    } catch (err: any) {
+      console.error('Error fetching tickets:', err);
+      setError(err.message || 'Failed to load tickets');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const openTickets = tickets.filter(t => t.status === 'open').length;
+  const inProgressTickets = tickets.filter(t => t.status === 'in_progress').length;
+  const resolvedToday = tickets.filter(t => t.status === 'resolved' && new Date(t.created_at).toDateString() === new Date().toDateString()).length;
+  const urgentTickets = tickets.filter(t => t.priority === 'critical').length;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -63,7 +80,7 @@ export default function SupportTicketsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Open Tickets</p>
-                <p className="text-3xl font-bold text-gray-900">0</p>
+                <p className="text-3xl font-bold text-gray-900">{isLoading ? '...' : openTickets}</p>
               </div>
               <AlertCircle className="w-8 h-8 text-blue-500" />
             </div>
@@ -75,7 +92,7 @@ export default function SupportTicketsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">In Progress</p>
-                <p className="text-3xl font-bold text-orange-600">0</p>
+                <p className="text-3xl font-bold text-orange-600">{isLoading ? '...' : inProgressTickets}</p>
               </div>
               <Clock className="w-8 h-8 text-orange-500" />
             </div>
@@ -87,7 +104,7 @@ export default function SupportTicketsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Resolved Today</p>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{isLoading ? '...' : resolvedToday}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-500" />
             </div>
@@ -99,7 +116,7 @@ export default function SupportTicketsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Urgent Tickets</p>
-                <p className="text-3xl font-bold text-red-600">0</p>
+                <p className="text-3xl font-bold text-red-600">{isLoading ? '...' : urgentTickets}</p>
               </div>
               <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
@@ -193,11 +210,11 @@ export default function SupportTicketsPage() {
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
                         <span className="flex items-center">
                           <User className="w-3 h-3 mr-1" />
-                          {ticket.assignee}
+                          {ticket.assigned_to?.name || 'Unassigned'}
                         </span>
                         <span className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
-                          {ticket.createdAt}
+                          {new Date(ticket.created_at).toLocaleDateString()}
                         </span>
                         <Badge variant="outline" className="text-xs">
                           {ticket.category}
