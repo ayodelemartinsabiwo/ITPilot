@@ -268,29 +268,29 @@ export default function AutoFixPage() {
                       {getStatusIcon(action.status)}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-gray-900">{action.issueTitle}</h3>
+                          <h3 className="font-semibold text-gray-900">{action.device_name || 'Auto-Fix Action'}</h3>
                           <Badge variant={action.status === 'COMPLETED' ? 'success' : action.status === 'FAILED' ? 'danger' : action.status === 'RUNNING' ? 'info' : 'warning'}>
                             {action.status}
                           </Badge>
-                          <Badge variant="outline">{action.fixType}</Badge>
+                          <Badge variant="outline">{action.fix_type}</Badge>
                           <Badge variant={action.impact === 'HIGH' ? 'danger' : action.impact === 'MEDIUM' ? 'warning' : 'info'}>
                             {action.impact} IMPACT
                           </Badge>
-                          {action.autoExecute && (
+                          {action.auto_execute && (
                             <Badge variant="success">Auto-Execute</Badge>
                           )}
                         </div>
                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                          <span>Device: {action.device}</span>
-                          <span>Created: {action.createdAt}</span>
-                          {action.completedAt && (
-                            <span>Completed: {action.completedAt}</span>
+                          <span>Device: {action.device_name}</span>
+                          <span>Created: {new Date(action.created_at).toLocaleString()}</span>
+                          {action.completed_at && (
+                            <span>Completed: {new Date(action.completed_at).toLocaleString()}</span>
                           )}
                         </div>
-                        {action.result && (
+                        {action.result_message && (
                           <div className={`mt-2 p-3 rounded-lg ${action.status === 'COMPLETED' ? 'bg-green-100' : 'bg-red-100'}`}>
                             <p className="text-sm font-medium">Result:</p>
-                            <p className="text-sm">{action.result}</p>
+                            <p className="text-sm">{action.result_message}</p>
                           </div>
                         )}
                       </div>
