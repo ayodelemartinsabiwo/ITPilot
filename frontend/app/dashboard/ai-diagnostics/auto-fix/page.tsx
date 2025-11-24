@@ -263,18 +263,18 @@ export default function AutoFixPage() {
                             setSelectedActions(selectedActions.filter(id => id !== action.id));
                           }
                         }}
-                        disabled={action.status !== 'pending'}
+                        disabled={action.status !== 'PENDING'}
                       />
                       {getStatusIcon(action.status)}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">{action.issueTitle}</h3>
-                          <Badge variant={action.status === 'completed' ? 'success' : action.status === 'failed' ? 'danger' : action.status === 'running' ? 'info' : 'warning'}>
-                            {action.status.toUpperCase()}
+                          <Badge variant={action.status === 'COMPLETED' ? 'success' : action.status === 'FAILED' ? 'danger' : action.status === 'RUNNING' ? 'info' : 'warning'}>
+                            {action.status}
                           </Badge>
                           <Badge variant="outline">{action.fixType}</Badge>
-                          <Badge variant={action.impact === 'high' ? 'danger' : action.impact === 'medium' ? 'warning' : 'info'}>
-                            {action.impact.toUpperCase()} IMPACT
+                          <Badge variant={action.impact === 'HIGH' ? 'danger' : action.impact === 'MEDIUM' ? 'warning' : 'info'}>
+                            {action.impact} IMPACT
                           </Badge>
                           {action.autoExecute && (
                             <Badge variant="success">Auto-Execute</Badge>
@@ -288,7 +288,7 @@ export default function AutoFixPage() {
                           )}
                         </div>
                         {action.result && (
-                          <div className={`mt-2 p-3 rounded-lg ${action.status === 'completed' ? 'bg-green-100' : 'bg-red-100'}`}>
+                          <div className={`mt-2 p-3 rounded-lg ${action.status === 'COMPLETED' ? 'bg-green-100' : 'bg-red-100'}`}>
                             <p className="text-sm font-medium">Result:</p>
                             <p className="text-sm">{action.result}</p>
                           </div>
@@ -296,7 +296,7 @@ export default function AutoFixPage() {
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4">
-                      {action.status === 'pending' && (
+                      {action.status === 'PENDING' && (
                         <>
                           <Button size="sm" variant="primary" onClick={() => executeAutoFix(action.id)}>
                             <PlayCircle className="w-4 h-4 mr-1" />
@@ -305,13 +305,13 @@ export default function AutoFixPage() {
                           <Button size="sm" variant="outline">View Details</Button>
                         </>
                       )}
-                      {action.status === 'running' && (
+                      {action.status === 'RUNNING' && (
                         <Button size="sm" variant="outline" disabled>
                           <Clock className="w-4 h-4 mr-1 animate-spin" />
                           Running...
                         </Button>
                       )}
-                      {(action.status === 'completed' || action.status === 'failed') && (
+                      {(action.status === 'COMPLETED' || action.status === 'FAILED') && (
                         <Button size="sm" variant="outline">View Report</Button>
                       )}
                     </div>
