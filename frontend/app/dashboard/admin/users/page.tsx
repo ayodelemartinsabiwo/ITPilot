@@ -32,7 +32,7 @@ export default function UserManagementPage() {
     },
   })
 
-  const adminUsers = usersData?.data || []
+  const adminUsers = usersData || []
 
   // Calculate user statistics
   const userStats = useMemo(() => {
