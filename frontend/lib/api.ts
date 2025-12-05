@@ -117,8 +117,9 @@ api.interceptors.response.use(
     // Handle other errors
     const errorMessage = getErrorMessage(error)
 
-    // Don't show toast for specific routes
-    const shouldShowToast = !originalRequest.url?.includes('/auth/me')
+    // Don't show toast for specific routes that have their own error handling
+    const excludedPaths = ['/auth/me', '/devices/', '/tickets/', '/auth/profile/', '/auth/change-password/']
+    const shouldShowToast = !excludedPaths.some(path => originalRequest.url?.includes(path))
 
     if (shouldShowToast && error.response?.status !== 401) {
       toast.error(errorMessage)

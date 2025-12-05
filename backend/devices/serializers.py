@@ -40,55 +40,89 @@ class DeviceSerializer(serializers.ModelSerializer):
         """Get device health status."""
         return obj.get_health_status()
 
+    def validate(self, attrs):
+        """Clean empty strings for fields that don't accept them."""
+        # Convert empty strings to None for IP address field
+        if 'ip_address' in attrs and attrs['ip_address'] == '':
+            attrs['ip_address'] = None
+
+        # Convert empty strings to None for numeric fields
+        for field in ['cpu_cores', 'ram_total_gb', 'disk_total_gb']:
+            if field in attrs and attrs[field] == '':
+                attrs[field] = None
+
+        # Convert empty strings to None for datetime fields
+        for field in ['agent_installed_at', 'last_seen_at', 'last_sync_at']:
+            if field in attrs and attrs[field] == '':
+                attrs[field] = None
+
+        return attrs
+
     def create(self, validated_data):
         """Create device with auto-generated device_id."""
         import uuid
+        import logging
         from organizations.models import OrganizationMember, Organization
         from django.utils.text import slugify
+        from django.db import transaction
 
-        # Generate unique device_id if not provided
-        if 'device_id' not in validated_data or not validated_data.get('device_id'):
-            validated_data['device_id'] = f"DEV-{uuid.uuid4().hex[:12].upper()}"
+        logger = logging.getLogger(__name__)
 
-        # Set organization from user if not provided
-        if 'organization' not in validated_data:
-            org_membership = OrganizationMember.objects.filter(
-                user=self.context['request'].user,
-                is_active=True
-            ).first()
+        try:
+            # Generate unique device_id if not provided
+            if 'device_id' not in validated_data or not validated_data.get('device_id'):
+                validated_data['device_id'] = f"DEV-{uuid.uuid4().hex[:12].upper()}"
 
-            if org_membership:
-                validated_data['organization'] = org_membership.organization
-            else:
-                # TESTING MODE: Auto-create a default organization for the user
-                user = self.context['request'].user
-                org_name = f"{user.first_name} {user.last_name}'s Organization" if user.first_name else f"{user.email}'s Organization"
-                org_slug = slugify(f"{user.email}-{uuid.uuid4().hex[:8]}")
+            # Set organization from user if not provided
+            if 'organization' not in validated_data:
+                org_membership = OrganizationMember.objects.filter(
+                    user=self.context['request'].user,
+                    is_active=True
+                ).first()
 
-                # Create organization
-                organization = Organization.objects.create(
-                    name=org_name,
-                    slug=org_slug,
-                    email=user.email,
-                    is_active=True,
-                    is_verified=True,
-                )
+                if org_membership:
+                    validated_data['organization'] = org_membership.organization
+                else:
+                    # TESTING MODE: Auto-create a default organization for the user
+                    user = self.context['request'].user
+                    logger.info(f"Creating organization for user: {user.email}")
 
-                # Add user as owner
-                OrganizationMember.objects.create(
-                    organization=organization,
-                    user=user,
-                    role='OWNER',
-                    is_active=True,
-                )
+                    org_name = f"{user.first_name} {user.last_name}'s Organization" if user.first_name else f"{user.email}'s Organization"
+                    org_slug = slugify(f"{user.email}-{uuid.uuid4().hex[:8]}")
 
-                validated_data['organization'] = organization
+                    # Use transaction to ensure atomicity
+                    with transaction.atomic():
+                        # Create organization
+                        organization = Organization.objects.create(
+                            name=org_name,
+                            slug=org_slug,
+                            email=user.email,
+                            is_active=True,
+                            is_verified=True,
+                        )
 
-        # Set user from request if not provided
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
+                        # Add user as owner
+                        OrganizationMember.objects.create(
+                            organization=organization,
+                            user=user,
+                            role='OWNER',
+                            is_active=True,
+                        )
 
-        return super().create(validated_data)
+                        validated_data['organization'] = organization
+                        logger.info(f"Successfully created organization: {organization.slug}")
+
+            # Set user from request if not provided
+            if 'user' not in validated_data:
+                validated_data['user'] = self.context['request'].user
+
+            return super().create(validated_data)
+
+        except Exception as e:
+            logger.error(f"Error creating device: {str(e)}", exc_info=True)
+            raise serializers.ValidationError({
+                'detail': f'Failed to create device: {str(e)}'
+            })
 
 
 class DeviceHealthSerializer(serializers.ModelSerializer):
