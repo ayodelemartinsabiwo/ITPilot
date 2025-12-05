@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
   User,
@@ -46,6 +46,7 @@ export default function SettingsPage() {
   })
 
   const [uploadingImage, setUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (user) {
@@ -287,29 +288,27 @@ export default function SettingsPage() {
                       <div>
                         <input
                           type="file"
-                          id="profile-picture-upload"
+                          ref={fileInputRef}
                           accept="image/*"
                           onChange={handleProfilePictureUpload}
                           className="hidden"
                           disabled={uploadingImage}
                         />
-                        <label htmlFor="profile-picture-upload">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            as="span"
-                            disabled={uploadingImage}
-                          >
-                            {uploadingImage ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Uploading...
-                              </>
-                            ) : (
-                              'Change Photo'
-                            )}
-                          </Button>
-                        </label>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={uploadingImage}
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {uploadingImage ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Uploading...
+                            </>
+                          ) : (
+                            'Change Photo'
+                          )}
+                        </Button>
                         <p className="text-xs text-gray-500 mt-1">
                           JPG, PNG or GIF (max 5MB)
                         </p>
