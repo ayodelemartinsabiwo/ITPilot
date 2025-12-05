@@ -44,6 +44,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         """Create device with auto-generated device_id."""
         import uuid
         from organizations.models import OrganizationMember
+        from rest_framework.exceptions import ValidationError
 
         # Generate unique device_id if not provided
         if 'device_id' not in validated_data or not validated_data.get('device_id'):
@@ -57,6 +58,10 @@ class DeviceSerializer(serializers.ModelSerializer):
             ).first()
             if org_membership:
                 validated_data['organization'] = org_membership.organization
+            else:
+                raise ValidationError({
+                    'organization': 'User is not a member of any organization. Please contact support to set up your organization.'
+                })
 
         # Set user from request if not provided
         if 'user' not in validated_data:
