@@ -289,8 +289,9 @@ export const usersAPI = {
 
   changePassword: (currentPassword: string, newPassword: string) =>
     api.post('/auth/change-password/', {
-      current_password: currentPassword,
-      new_password: newPassword
+      old_password: currentPassword,
+      new_password: newPassword,
+      new_password_confirm: newPassword
     }),
 
   inviteUser: (data: { email: string; role: string; organization?: string }) =>
@@ -353,7 +354,7 @@ export const settingsAPI = {
   updatePreferences: (data: any) =>
     api.patch('/auth/profile/', data),
 
-  changePassword: (data: { current_password: string; new_password: string }) =>
+  changePassword: (data: { old_password: string; new_password: string; new_password_confirm: string }) =>
     api.post('/auth/change-password/', data),
 }
 
