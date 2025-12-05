@@ -43,8 +43,8 @@ class DeviceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create device with auto-generated device_id."""
         import uuid
-        from organizations.models import OrganizationMember
-        from rest_framework.exceptions import ValidationError
+        from organizations.models import OrganizationMember, Organization
+        from django.utils.text import slugify
 
         # Generate unique device_id if not provided
         if 'device_id' not in validated_data or not validated_data.get('device_id'):
@@ -56,12 +56,33 @@ class DeviceSerializer(serializers.ModelSerializer):
                 user=self.context['request'].user,
                 is_active=True
             ).first()
+
             if org_membership:
                 validated_data['organization'] = org_membership.organization
             else:
-                raise ValidationError({
-                    'organization': 'User is not a member of any organization. Please contact support to set up your organization.'
-                })
+                # TESTING MODE: Auto-create a default organization for the user
+                user = self.context['request'].user
+                org_name = f"{user.first_name} {user.last_name}'s Organization" if user.first_name else f"{user.email}'s Organization"
+                org_slug = slugify(f"{user.email}-{uuid.uuid4().hex[:8]}")
+
+                # Create organization
+                organization = Organization.objects.create(
+                    name=org_name,
+                    slug=org_slug,
+                    email=user.email,
+                    is_active=True,
+                    is_verified=True,
+                )
+
+                # Add user as owner
+                OrganizationMember.objects.create(
+                    organization=organization,
+                    user=user,
+                    role='OWNER',
+                    is_active=True,
+                )
+
+                validated_data['organization'] = organization
 
         # Set user from request if not provided
         if 'user' not in validated_data:

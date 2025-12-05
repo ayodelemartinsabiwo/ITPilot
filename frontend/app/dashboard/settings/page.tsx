@@ -45,6 +45,8 @@ export default function SettingsPage() {
     date_format: 'MM/DD/YYYY',
   })
 
+  const [uploadingImage, setUploadingImage] = useState(false)
+
   useEffect(() => {
     if (user) {
       setProfileData({
@@ -79,8 +81,8 @@ export default function SettingsPage() {
   })
 
   const changePasswordMutation = useMutation({
-    mutationFn: async (data: { current_password: string; new_password: string }) => {
-      const response = await usersAPI.changePassword(data.current_password, data.new_password)
+    mutationFn: async (data: { old_password: string; new_password: string; new_password_confirm: string }) => {
+      const response = await settingsAPI.changePassword(data)
       return response.data
     },
     onSuccess: () => {
@@ -122,8 +124,9 @@ export default function SettingsPage() {
         return
       }
       changePasswordMutation.mutate({
-        current_password: passwordData.current_password,
+        old_password: passwordData.current_password,
         new_password: passwordData.new_password,
+        new_password_confirm: passwordData.confirm_password,
       })
     } else if (activeTab === 'preferences') {
       updatePreferencesMutation.mutate(preferencesData)
@@ -155,6 +158,37 @@ export default function SettingsPage() {
       ...preferencesData,
       [e.target.name]: e.target.value,
     })
+  }
+
+  const handleProfilePictureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB')
+      return
+    }
+
+    try {
+      setUploadingImage(true)
+      const formData = new FormData()
+      formData.append('profile_picture', file)
+
+      const response = await usersAPI.updateProfile(formData)
+      setUser({ ...user, ...response.data })
+      toast.success('Profile picture updated successfully!')
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to upload profile picture')
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   return (
@@ -239,12 +273,47 @@ export default function SettingsPage() {
                       Profile Picture
                     </label>
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium text-xl shadow-md">
-                        {(user?.full_name || user?.first_name || user?.email || '').charAt(0).toUpperCase()}
+                      {user?.profile_picture ? (
+                        <img
+                          src={user.profile_picture}
+                          alt="Profile"
+                          className="w-16 h-16 rounded-full object-cover shadow-md"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium text-xl shadow-md">
+                          {(user?.full_name || user?.first_name || user?.email || '').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <input
+                          type="file"
+                          id="profile-picture-upload"
+                          accept="image/*"
+                          onChange={handleProfilePictureUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                        <label htmlFor="profile-picture-upload">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            as="span"
+                            disabled={uploadingImage}
+                          >
+                            {uploadingImage ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              'Change Photo'
+                            )}
+                          </Button>
+                        </label>
+                        <p className="text-xs text-gray-500 mt-1">
+                          JPG, PNG or GIF (max 5MB)
+                        </p>
                       </div>
-                      <Button variant="outline" size="sm">
-                        Change Photo
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
