@@ -45,7 +45,13 @@ export function AddDeviceModal({ isOpen, onClose }: AddDeviceModalProps) {
       })
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to add device')
+      console.error('Device creation error:', error)
+      const errorMsg = error.response?.data?.detail ||
+                      error.response?.data?.message ||
+                      error.response?.data?.error ||
+                      error.message ||
+                      'Failed to add device'
+      toast.error(errorMsg)
     },
   })
 
